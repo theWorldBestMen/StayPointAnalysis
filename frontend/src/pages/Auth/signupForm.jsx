@@ -12,6 +12,7 @@ import { AccountContext } from "./accountContext";
 
 export function SignupForm(props) {
   const { switchToSignin } = useContext(AccountContext);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -87,6 +88,58 @@ export function SignupForm(props) {
     [password]
   );
 
+  const onSubmit = useCallback(async () => {
+    if (loading) {
+      return;
+    }
+    if (!email || !email.trim()) {
+      return alert('이메일을 입력해주세요.');
+    }
+    if (!name || !name.trim()) {
+      return alert('이름을 입력해주세요.');
+    }
+    if (!password || !password.trim()) {
+      return alert('비밀번호를 입력해주세요.');
+    }
+    // 이메일 검증
+    if (emailError) {
+      return alert('올바른 이메일 주소가 아닙니다.');
+    }
+    // 비밀번호
+    if (passwordError) {
+      return alert('비밀번호는 영문,숫자,특수문자($@^!%*#?&)를 모두 포함하여 8자 이상 입력해야합니다.',);
+    }
+
+    console.log(email, name, password);
+
+    try {
+      setLoading(true);
+      // http 메서드: get, put, patch, post, delete, head, options
+      const response = await axios.post("/api/users",
+        {
+          name,
+          email,
+          password, // hash화, 일방향 암호화, 양방향 암호화 => 복호화
+        },
+        // {
+        //   headers: {
+        //     token: email,
+        //   },
+        // },
+      );
+      console.log(response);
+      alert('회원가입 되었습니다.');
+      switchToSignin();
+    } catch (error) {
+      const errorResponse = (error as AxiosError).response;
+      if (errorResponse) {
+        alert(errorResponse.data.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [email, name, password]);
+
   return (
     <BoxContainer>
       <FormContainer>
@@ -138,7 +191,7 @@ export function SignupForm(props) {
         )}
       </FormContainer>
       <Marginer direction="vertical" margin="1em" />
-      <SubmitButton type="submit">회원가입</SubmitButton>
+      <SubmitButton type="submit" onClick={onSubmit}>회원가입</SubmitButton>
       <Marginer direction="vertical" margin="1em" />
       <BoldLink href="#" onClick={switchToSignin}>
         로그인
