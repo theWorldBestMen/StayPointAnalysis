@@ -1,11 +1,10 @@
-from index import db, bcrypt
+from index import bcrypt
 
 def hashed_password(password):
     return bcrypt.generate_password_hash(password).decode("utf-8")
 
-# def get_user_with_email_and_password(email, password):
-#     user = User.query.filter_by(email=email).first()
-#     if user and bcrypt.check_password_hash(user.password, password):
-#         return user
-#     else:
-#         return None
+def check_password(pw_hashed, password):
+    if bcrypt.check_password_hash(pw_hashed, password):
+        return True
+    else:
+        return False

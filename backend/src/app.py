@@ -3,9 +3,13 @@ from flask import request, render_template, jsonify, url_for, redirect, g
 # from .models import User
 from index import app, db, mongo
 from sqlalchemy.exc import IntegrityError
-from .utils.auth import hashed_password
+from .utils.auth import hashed_password, check_password
 from flask_jwt_extended import ( jwt_required, create_access_token, get_jwt_identity, 
-                                unset_jwt_cookies, create_refresh_token, jwt_refresh_token_required )
+                                unset_jwt_cookies, create_refresh_token )
+
+ADMIN="admin"
+RESEARCHER="researcher"
+SUBJECT="subject"
 
 
 @app.route('/', methods=['GET'])
@@ -15,7 +19,7 @@ def index():
 
 # @app.route('/<path:path>', methods=['GET'])
 # def any_root_path(path):
-#     return jsonify(message='abc')
+#     return jsonify(message='hello')
 
 
 # @app.route("/users", methods=["GET"])
@@ -34,6 +38,7 @@ def signup():
     name = incoming["name"]
     email = incoming["email"]
     password = incoming["password"]
+    role = incoming["role"]
     
     if not name:
         return jsonify(message="이름이 없습니다."), 400
@@ -41,15 +46,16 @@ def signup():
         return jsonify(message="이메일이 없습니다."), 400
     if not password:
         return jsonify(message="비밀번호가 없습니다."), 400
+    if not role:
+        return jsonify(message="사용자 역할이 없습니다."), 400
     
-    try:
-        hashed_pw = hashed_password(password)
-        id = mongo.db.user.insert({'name': name, 'email': email, 'password': hashed_pw})
-        
-        return jsonify(message="회원가입이 완료되었습니다."), 200
-    except IntegrityError:
-        return jsonify(message="이미 가입된 이메일입니다."), 409
-
+    if mongo.db.user.find_one({'email': email}):
+        return jsonify(message="이미 가입된 이메일입니다."), 400
+    
+    hashed_pw = hashed_password(password)
+    id = mongo.db.user.insert_one({'name': name, 'email': email, 'password': hashed_pw, 'role': role})
+    
+    return jsonify(message="회원가입이 완료되었습니다."), 200
 
     
 @app.route('/auth/login', methods=['POST'])
@@ -67,14 +73,18 @@ def login():
     if not password:
         return jsonify(message="비밀번호가 없습니다."), 400
 
-    if email != 'test' or password != 'test': # TODO: DB 검색
-        return jsonify(message="이메일 혹은 비밀번호가 일치하지 않습니다."), 401
+    user_info = mongo.db.user.find_one({'email': email})
+    if not user_info:
+        return jsonify(message="가입하지 않은 이메일입니다."), 401
     
-    # Identity can be any data that is json serializable
+    user_pw = user_info['password']
+    if not check_password(user_pw, password):
+        return jsonify(message="비밀번호가 일치하지 않습니다."), 401
+    
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
 
-    return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token), 200
 
 
 @app.route('/protected', methods=['GET'])
@@ -86,7 +96,7 @@ def protected():
 
 
 @app.route('/refresh', methods=['GET'])
-@jwt_refresh_token_required
+@jwt_required(refresh=True)
 def refresh():
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
@@ -95,7 +105,7 @@ def refresh():
 
 # 긴 시간이 필요한 토큰 발급(1일)
 @app.route('/refresh_long', methods=['GET'])
-@jwt_refresh_token_required
+@jwt_required(refresh=True)
 def refreshLong():
     cur_user = get_jwt_identity()
     delta = datetime.timedelta(days=1)
