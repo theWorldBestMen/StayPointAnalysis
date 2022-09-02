@@ -18,6 +18,7 @@ export function SignupForm(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setpasswordCheck] = useState("");
+  const [role, setRole] = useState("");
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setpasswordError] = useState(false);
@@ -89,6 +90,10 @@ export function SignupForm(props) {
     [password]
   );
 
+  const onChangeRole = useCallback((event) => {
+    setRole(event.target.value);
+  }, []);
+
   const onSubmit = useCallback(async () => {
     if (loading) {
       return;
@@ -113,16 +118,16 @@ export function SignupForm(props) {
       );
     }
 
-    // console.log(email, name, password);
+    // TODO: 비밀번호 암호화
 
     try {
-      // http 메서드: get, put, patch, post, delete, head, options
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
+        `${process.env.REACT_APP_API_URL}/auth/signup`,
         {
           name,
           email,
           password,
+          role,
         }
       );
       console.log(response);
@@ -143,6 +148,7 @@ export function SignupForm(props) {
     name,
     password,
     passwordError,
+    role,
     switchToSignin,
   ]);
 
@@ -195,6 +201,14 @@ export function SignupForm(props) {
             {passwordCheckErrorMessage}
           </div>
         )}
+        {/* TODO: Change Role Input */}
+        <Input
+          type="text"
+          placeholder="역할"
+          onChange={onChangeRole}
+          value={role}
+        />
+        <Marginer direction="vertical" margin="1em" />
       </FormContainer>
       <Marginer direction="vertical" margin="1em" />
       <SubmitButton type="submit" onClick={onSubmit}>

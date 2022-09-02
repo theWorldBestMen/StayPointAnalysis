@@ -2,33 +2,39 @@ import React, { useState, useEffect } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
 import Auth from "./pages/Auth";
-
+import { useAppDispatch } from "./store";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/reducer";
+import { Link, Route, Routes } from "react-router-dom";
+import AuthRoute from "./AuthRoute";
 function AppInner() {
-  const [test, setTest] = useState("test");
+  const dispatch = useAppDispatch();
+  const authenticated = useSelector((state: RootState) => !!state.user.email);
 
   useEffect(() => {
-    async function apiTest() {
-      try {
-        const response: { data: { message: string } } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/`
-        );
-        console.log(response);
-        setTest(response.data.message);
-      } catch (error) {
-        const errorResponse = (error as AxiosError).response;
-        if (errorResponse) {
-          console.error("errorResponse", errorResponse);
-        }
-      }
-    }
-
-    apiTest();
-  }, []);
+    console.log("authenticated:", authenticated);
+  }, [authenticated]);
 
   return (
-    <div>
-      <Auth />
-    </div>
+    <Routes>
+      <Route path="/" element={<Auth />} />
+      <Route
+        path="/dashboard"
+        element={
+          <AuthRoute authenticated={authenticated}>
+            <div>login page</div>
+          </AuthRoute>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <main style={{ padding: "1rem" }}>
+            <p>페이지 없음</p>
+          </main>
+        }
+      />
+    </Routes>
   );
 }
 

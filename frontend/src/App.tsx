@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
 import styled from "styled-components";
+import { BrowserRouter } from "react-router-dom";
 
 import { Provider } from "react-redux";
 import store from "./store";
@@ -17,11 +17,13 @@ const AppContainer = styled.div`
 
 function App() {
   return (
-    <Provider store={store}>
-      <AppContainer>
-        <AppInner />
-      </AppContainer>
-    </Provider>
+    <BrowserRouter>
+      <Provider store={store}>
+        <AppContainer>
+          <AppInner />
+        </AppContainer>
+      </Provider>
+    </BrowserRouter>
   );
 }
 

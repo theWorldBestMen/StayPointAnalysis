@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { LoginForm } from "./loginForm";
+import { LoginForm } from "./LoginForm";
 import { motion } from "framer-motion";
 import { AccountContext } from "./accountContext";
-import { SignupForm } from "./signupForm";
+import { SignupForm } from "./SignupForm";
 
 const BoxContainer = styled.div`
   width: 300px;
@@ -116,14 +116,14 @@ export default function Auth(props) {
     playExpandingAnimation();
     setTimeout(() => {
       setActive("signup");
-    }, 400);
+    }, 500);
   };
 
   const switchToSignin = () => {
     playExpandingAnimation();
     setTimeout(() => {
       setActive("signin");
-    }, 400);
+    }, 500);
   };
 
   const contextValue = { switchToSignup, switchToSignin };

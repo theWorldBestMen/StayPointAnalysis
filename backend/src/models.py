@@ -1,20 +1,18 @@
 from index import db, bcrypt
 from sqlalchemy import Integer, Enum
-from .role import Role
+
 
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
-    role = db.Column(Enum(Role))
 
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
         self.active = True
         self.password = User.hashed_password(password)
-        # self.role = role
 
     @staticmethod
     def hashed_password(password):

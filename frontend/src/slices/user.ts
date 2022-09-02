@@ -13,7 +13,6 @@ const initialState = {
   name: "",
   email: "",
   accessToken: "",
-  money: 0,
 };
 
 const userSlice = createSlice({
@@ -33,9 +32,6 @@ const userSlice = createSlice({
     },
     setAccessToken(state, action: PayloadAction<string>) {
       state.accessToken = action.payload;
-    },
-    setMoney(state, action: PayloadAction<number>) {
-      state.money = action.payload;
     },
   },
   extraReducers: (builder) => {},

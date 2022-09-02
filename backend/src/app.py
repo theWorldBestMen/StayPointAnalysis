@@ -6,26 +6,32 @@ from sqlalchemy.exc import IntegrityError
 from .utils.auth import hashed_password, check_password
 from flask_jwt_extended import ( jwt_required, create_access_token, get_jwt_identity, 
                                 unset_jwt_cookies, create_refresh_token )
+import requests
+import json
+
+from .utils.pytraccar.exceptions import (
+    ForbiddenAccessException,
+    InvalidTokenException,
+    BadRequestException,
+    ObjectNotFoundException,
+    UserPermissionException
+)
+
+from .utils.pytraccar.api import TraccarAPI
+
+from base64 import b64encode
 
 ADMIN="admin"
 RESEARCHER="researcher"
 SUBJECT="subject"
+TRACCAR_API_URL="http://localhost:8082"
 
+basic_auth = b64encode(b"admin:admin").decode("ascii")
+headers = { 'Authorization' : f'Basic {basic_auth}' }
 
 @app.route('/', methods=['GET'])
 def index():
     return jsonify(message='hello')
-
-
-# @app.route('/<path:path>', methods=['GET'])
-# def any_root_path(path):
-#     return jsonify(message='hello')
-
-
-# @app.route("/users", methods=["GET"])
-# @requires_auth
-# def get_user():
-#     return jsonify(result=g.current_user)
 
 
 @app.route("/auth/signup", methods=["POST"])
@@ -53,6 +59,19 @@ def signup():
         return jsonify(message="이미 가입된 이메일입니다."), 400
     
     hashed_pw = hashed_password(password)
+    
+    data = {
+        "name": name,
+        "email": email,
+        "password": hashed_pw,
+    }
+    
+    print(data)
+    response = requests.post(url=TRACCAR_API_URL+"/api/users", json=data, headers=headers)
+    
+    if response.status_code != 200:
+        return jsonify(message="회원가입 오류(Traccar)"), 400
+    
     id = mongo.db.user.insert_one({'name': name, 'email': email, 'password': hashed_pw, 'role': role})
     
     return jsonify(message="회원가입이 완료되었습니다."), 200
@@ -81,18 +100,45 @@ def login():
     if not check_password(user_pw, password):
         return jsonify(message="비밀번호가 일치하지 않습니다."), 401
     
+    user = TraccarAPI(base_url=TRACCAR_API_URL)
+    result = user.login_with_credentials(username=email, password=user_pw)
+    assert type(result) == dict
+    
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
+    print()
+    print(f"access_token: {access_token}")
+    print()
+    print(f"refresh_token: {refresh_token}")
+    print()
+    data = {
+        "name": user_info["name"],
+        "email": user_info["email"],
+    }
+    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
 
-    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token), 200
 
-
-@app.route('/protected', methods=['GET'])
-@jwt_required
-def protected():
+@app.route('/user', methods=['GET'])
+@jwt_required()
+def user_info():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    user_info = mongo.db.user.find_one({'email': current_user})
+    
+    user = TraccarAPI(base_url=TRACCAR_API_URL)
+    email = user_info['email']
+    password = user_info['password']
+    result = user.login_with_credentials(username=email, password=password)
+    assert type(result) == dict
+    
+    print(result)
+    
+    data = {
+        "name": user_info["name"],
+        "email": user_info["email"],
+        "role": user_info["role"],
+    }
+    return jsonify(data=data), 200
 
 
 @app.route('/refresh', methods=['GET'])
@@ -111,27 +157,3 @@ def refreshLong():
     delta = datetime.timedelta(days=1)
     access_token = create_access_token(identity=cur_user, expires_delta=delta)
     return jsonify(access_token=access_token)
-
-
-
-
-
-# @app.route("/get_token", methods=["POST"])
-# def get_token():
-#     incoming = request.get_json()
-#     user = User.get_user_with_email_and_password(incoming["email"], incoming["password"])
-#     if user:
-#         return jsonify(token=generate_token(user))
-
-#     return jsonify(error=True), 403
-
-
-# @app.route("/is_token_valid", methods=["POST"])
-# def is_token_valid():
-#     incoming = request.get_json()
-#     is_valid = verify_token(incoming["token"])
-
-#     if is_valid:
-#         return jsonify(token_is_valid=True)
-#     else:
-#         return jsonify(token_is_valid=False), 403
