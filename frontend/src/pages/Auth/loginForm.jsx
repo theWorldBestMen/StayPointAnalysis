@@ -1,5 +1,6 @@
 import React, { useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { setCookie } from "../../utils/cookie";
 
 import {
   BoldLink,
@@ -38,10 +39,14 @@ export function LoginForm(props) {
         userSlice.actions.setUser({
           name: response.data.data.name,
           email: response.data.data.email,
-          accessToken: response.data.accessToken,
+          accessToken: response.data.access_token,
         })
       );
-      // TODO: refresh token 저장하기
+      console.log(`resfresh token: ${response.data.refresh_token}`);
+      setCookie("refreshToken", response.data.refresh_token, {
+        secure: true,
+        // httpOnly: true,
+      });
       navigate("/dashboard");
     } catch (error) {
       const errorResponse = error.response;

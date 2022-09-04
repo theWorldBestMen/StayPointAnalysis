@@ -114,11 +114,12 @@ def login():
     data = {
         "name": user_info["name"],
         "email": user_info["email"],
+        #TODO: result data 넣기
     }
     return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
 
 
-@app.route('/user', methods=['GET'])
+@app.route('/users', methods=['GET'])
 @jwt_required()
 def user_info():
     # Access the identity of the current user with get_jwt_identity

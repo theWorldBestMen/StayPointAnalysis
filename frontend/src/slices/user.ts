@@ -30,7 +30,7 @@ const userSlice = createSlice({
     setEmail(state, action) {
       state.email = action.payload;
     },
-    setAccessToken(state, action: PayloadAction<string>) {
+    setAccessToken(state, action) {
       state.accessToken = action.payload;
     },
   },
