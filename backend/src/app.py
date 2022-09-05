@@ -7,6 +7,7 @@ from .utils.auth import hashed_password, check_password
 from flask_jwt_extended import ( jwt_required, create_access_token, get_jwt_identity, 
                                 unset_jwt_cookies, create_refresh_token )
 import requests
+from requests.auth import HTTPBasicAuth
 import json
 
 from .utils.pytraccar.exceptions import (
@@ -26,8 +27,7 @@ RESEARCHER="researcher"
 SUBJECT="subject"
 TRACCAR_API_URL="http://localhost:8082"
 
-basic_auth = b64encode(b"admin:admin").decode("ascii")
-headers = { 'Authorization' : f'Basic {basic_auth}' }
+basic_auth = HTTPBasicAuth('admin', 'admin')
 
 @app.route('/', methods=['GET'])
 def index():
@@ -67,7 +67,7 @@ def signup():
     }
     
     print(data)
-    response = requests.post(url=TRACCAR_API_URL+"/api/users", json=data, headers=headers)
+    response = requests.post(url=TRACCAR_API_URL+"/api/users", json=data, auth=basic_auth)
     
     if response.status_code != 200:
         return jsonify(message="회원가입 오류(Traccar)"), 400
