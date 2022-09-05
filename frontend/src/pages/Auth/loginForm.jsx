@@ -42,7 +42,6 @@ export function LoginForm(props) {
           accessToken: response.data.access_token,
         })
       );
-      console.log(`resfresh token: ${response.data.refresh_token}`);
       setCookie("refreshToken", response.data.refresh_token, {
         secure: true,
         // httpOnly: true,

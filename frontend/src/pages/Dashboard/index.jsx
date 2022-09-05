@@ -4,16 +4,13 @@ import { getCookie, setCookie } from "../../utils/cookie";
 import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
+import { RenderAfterNavermapsLoaded, NaverMap } from "react-naver-maps";
 
 function Dashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector((state: RootState) => state.user);
-
-  useEffect(() => {
-    console.log("userInfo: ", userInfo);
-  }, []);
 
   const onLogout = () => {
     dispatch(
@@ -23,13 +20,24 @@ function Dashboard() {
         accessToken: "",
       })
     );
-    setCookie("refreshToken", null);
+    setCookie("refreshToken", "");
     navigate("/");
   };
 
   return (
     <>
-      <div>로그인 화면</div>
+      <RenderAfterNavermapsLoaded
+        ncpClientId={process.env.REACT_APP_NCPClientId}
+      >
+        <NaverMap
+          style={{
+            width: "100%",
+            height: "500px",
+          }}
+          defaultCenter={{ lat: 37.3595704, lng: 127.105399 }}
+          defaultZoom={13}
+        />
+      </RenderAfterNavermapsLoaded>
       <button onClick={onLogout}>로그아웃</button>
     </>
   );
