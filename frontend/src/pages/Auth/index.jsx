@@ -6,8 +6,8 @@ import { AccountContext } from "./accountContext";
 import { SignupForm } from "./SignupForm";
 
 const BoxContainer = styled.div`
-  width: 300px;
-  min-height: 620px;
+  width: 350px;
+  min-height: 700px;
   display: flex;
   flex-direction: column;
   border-radius: 19px;
@@ -19,7 +19,7 @@ const BoxContainer = styled.div`
 
 const TopContainer = styled.div`
   width: 100%;
-  height: 250px;
+  height: 210px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -28,16 +28,17 @@ const TopContainer = styled.div`
 `;
 
 const BackDrop = styled(motion.div)`
-  width: 160%;
-  height: 550px;
+  width: 200%;
+  height: 570px;
   position: absolute;
   display: flex;
   flex-direction: column;
   border-radius: 50%;
-  transform: rotate(60deg);
-  top: -290px;
-  left: -70px;
+  transform: rotate(10deg);
+  top: -390px;
+  left: -230px;
   background: #114d86;
+  z-index: 1;
 `;
 
 const HeaderContainer = styled.div`
@@ -82,22 +83,22 @@ const InnerContainer = styled.div`
 
 const backdropVariants = {
   expanded: {
-    width: "233%",
-    height: "1050px",
-    borderRadius: "20%",
-    transform: "rotate(60deg)",
+    width: "250%",
+    height: "1250px",
+    borderRadius: "50%",
+    transform: "rotate(30deg)",
   },
   collapsed: {
-    width: "160%",
-    height: "550px",
+    width: "200%",
+    height: "570px",
     borderRadius: "50%",
-    transform: "rotate(60deg)",
+    transform: "rotate(10deg)",
   },
 };
 
 const expandingTransition = {
   type: "spring",
-  duration: 2.3,
+  duration: 2.5,
   stiffness: 30,
 };
 

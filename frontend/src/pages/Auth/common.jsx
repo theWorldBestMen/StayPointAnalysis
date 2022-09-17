@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Select from "react-select";
 
 export const BoxContainer = styled.div`
   width: 100%;
@@ -38,7 +39,7 @@ export const Input = styled.input`
   padding: 0px 10px;
   border-bottom: 1.5px solid rgba(200, 200, 200, 0.4);
   transition: all 200ms ease-in-out;
-  font-size: 12px;
+  font-size: 16px;
 
   &::placeholder {
     color: rgba(200, 200, 200, 1);

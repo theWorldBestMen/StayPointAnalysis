@@ -20,14 +20,12 @@ from .utils.pytraccar.exceptions import (
 
 from .utils.pytraccar.api import TraccarAPI
 
-from base64 import b64encode
+TRACCAR_API_URL="http://localhost:8082"
 
 ADMIN="admin"
 RESEARCHER="researcher"
 SUBJECT="subject"
-TRACCAR_API_URL="http://localhost:8082"
 
-basic_auth = HTTPBasicAuth('admin', 'admin')
 
 @app.route('/', methods=['GET'])
 def index():
@@ -42,6 +40,7 @@ def signup():
     incoming = request.get_json()
     
     name = incoming["name"]
+    phone = incoming["phone"]
     email = incoming["email"]
     password = incoming["password"]
     role = incoming["role"]
@@ -60,19 +59,34 @@ def signup():
     
     hashed_pw = hashed_password(password)
     
-    data = {
+    traccar_data = {
         "name": name,
         "email": email,
         "password": hashed_pw,
+        'deviceLimit': 1,
     }
     
-    print(data)
-    response = requests.post(url=TRACCAR_API_URL+"/api/users", json=data, auth=basic_auth)
+    # traccar id 생성
+    basic_admin = HTTPBasicAuth('admin', 'admin')
+    response = requests.post(url=TRACCAR_API_URL+"/api/users", json=traccar_data, auth=basic_admin)
     
     if response.status_code != 200:
         return jsonify(message="회원가입 오류(Traccar)"), 400
     
-    id = mongo.db.user.insert_one({'name': name, 'email': email, 'password': hashed_pw, 'role': role})
+    # traccar device 등록
+    user = TraccarAPI(base_url=TRACCAR_API_URL)
+    user_info = user.login_with_credentials(username=email, password=hashed_pw)
+    device = user.create_device(name="device", unique_id=phone[-4:])
+    
+    user_data = traccar_data
+    user_data["phone"] = phone
+    user_data["role"] = role
+    user_data["device_id"] = device["uniqueId"]
+    
+    id = mongo.db.user.insert_one(user_data)
+    
+    user = mongo.db.user.find_one({'email': email})
+    print(f'user info in mongo: {user}')
     
     return jsonify(message="회원가입이 완료되었습니다."), 200
 
@@ -100,21 +114,12 @@ def login():
     if not check_password(user_pw, password):
         return jsonify(message="비밀번호가 일치하지 않습니다."), 401
     
-    user = TraccarAPI(base_url=TRACCAR_API_URL)
-    result = user.login_with_credentials(username=email, password=user_pw)
-    assert type(result) == dict
-    
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
-    print()
-    print(f"access_token: {access_token}")
-    print()
-    print(f"refresh_token: {refresh_token}")
-    print()
     data = {
         "name": user_info["name"],
         "email": user_info["email"],
-        #TODO: result data 넣기
+        "role": user_info["role"],
     }
     return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
 
@@ -122,24 +127,57 @@ def login():
 @app.route('/users', methods=['GET'])
 @jwt_required()
 def user_info():
-    # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     user_info = mongo.db.user.find_one({'email': current_user})
-    
-    user = TraccarAPI(base_url=TRACCAR_API_URL)
-    email = user_info['email']
-    password = user_info['password']
-    result = user.login_with_credentials(username=email, password=password)
-    assert type(result) == dict
-    
-    print(result)
     
     data = {
         "name": user_info["name"],
         "email": user_info["email"],
         "role": user_info["role"],
     }
+    
     return jsonify(data=data), 200
+
+@app.route('/researchers', methods=['GET'])
+@jwt_required()
+def get_researcher():
+    researcher_list = mongo.db.user.find({'role': 'researcher'})
+    result = [
+        { 
+            "name": researcher["name"], 
+            "email": researcher["email"] 
+        } 
+        for researcher in researcher_list
+    ]
+    return jsonify(data=result), 200
+
+@app.route('/researchers', methods=['POST'])
+@jwt_required()
+def subject_to_researcher():
+    current_user = get_jwt_identity()
+    
+    incoming = request.get_json()
+    researcher_email = incoming['researcher_email']
+    
+    researcher_data = mongo.db.user.find_one({'email': researcher_email})
+    subject_data = mongo.db.user.find_one({'email': current_user})
+    
+    subject_list = researcher_data['subject_list']
+    if not subject_list:
+        subject_list = []
+    subject_list.append({"email": subject_data["email"], "name": subject_data["name"]})
+    
+    researcher_info = {"email": researcher_email, "name": researcher_data["name"]}
+    
+    mongo.db.user.update_one({'email': researcher_email}, {'subject_list': subject_list})
+    mongo.db.user.update_one({'email': current_user}, {'researcher_info': researcher_info})
+    
+    researcher_data = mongo.db.user.find_one({'email': researcher_email})
+    subject_data = mongo.db.user.find_one({'email': current_user})
+    print(researcher_data)
+    print(subject_data)
+    return jsonify(message="실험 참가자 등록 완료"), 200
+
 
 
 @app.route('/refresh', methods=['GET'])

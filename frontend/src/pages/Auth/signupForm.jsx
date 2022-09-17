@@ -1,20 +1,26 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import {
   BoldLink,
   BoxContainer,
   FormContainer,
   Input,
-  MutedLink,
   SubmitButton,
 } from "./common";
 import { Marginer } from "../../components/marginer";
+import Select from "react-select";
 import { AccountContext } from "./accountContext";
 import axios, { AxiosError, AxiosResponse } from "axios";
+
+const roleOptions = [
+  { value: "researcher", label: "연구자" },
+  { value: "subject", label: "실험 참가자" },
+];
 
 export function SignupForm(props) {
   const { switchToSignin } = useContext(AccountContext);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setpasswordCheck] = useState("");
@@ -32,6 +38,11 @@ export function SignupForm(props) {
   const onChangeName = useCallback((event) => {
     const input: string = event.target.value;
     setName(input.trim());
+  }, []);
+
+  const onChangePhone = useCallback((event) => {
+    const input: string = event.target.value;
+    setPhone(input.trim());
   }, []);
 
   const checkEmailValid: boolean = (input) => {
@@ -90,22 +101,21 @@ export function SignupForm(props) {
     [password]
   );
 
-  const onChangeRole = useCallback((event) => {
-    setRole(event.target.value);
-  }, []);
-
   const onSubmit = useCallback(async () => {
     if (loading) {
       return;
     }
-    if (!email || !email.trim()) {
-      return alert("이메일을 입력해주세요.");
-    }
     if (!name || !name.trim()) {
       return alert("이름을 입력해주세요.");
     }
+    if (!email || !email.trim()) {
+      return alert("이메일을 입력해주세요.");
+    }
     if (!password || !password.trim()) {
       return alert("비밀번호를 입력해주세요.");
+    }
+    if (!role) {
+      return alert("역할을 선택해주세요.");
     }
     // 이메일 검증
     if (emailError) {
@@ -125,6 +135,7 @@ export function SignupForm(props) {
         `${process.env.REACT_APP_API_URL}/auth/signup`,
         {
           name,
+          phone,
           email,
           password,
           role,
@@ -142,6 +153,7 @@ export function SignupForm(props) {
       setLoading(false);
     }
   }, [
+    phone,
     email,
     emailError,
     loading,
@@ -160,6 +172,13 @@ export function SignupForm(props) {
           placeholder="이름"
           onChange={onChangeName}
           value={name}
+        />
+        <Marginer direction="vertical" margin="1em" />
+        <Input
+          type="text"
+          placeholder="전화번호"
+          onChange={onChangePhone}
+          value={phone}
         />
         <Marginer direction="vertical" margin="1em" />
         <Input
@@ -201,12 +220,10 @@ export function SignupForm(props) {
             {passwordCheckErrorMessage}
           </div>
         )}
-        {/* TODO: Change Role Input */}
-        <Input
-          type="text"
+        <Select
           placeholder="역할"
-          onChange={onChangeRole}
-          value={role}
+          options={roleOptions}
+          onChange={(e) => setRole(e.value)}
         />
         <Marginer direction="vertical" margin="1em" />
       </FormContainer>

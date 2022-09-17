@@ -5,12 +5,17 @@ import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
 import { RenderAfterNavermapsLoaded, NaverMap } from "react-naver-maps";
+import { getUserInfo } from "../../utils/getUserInfo";
 
-function Dashboard() {
+export function Dashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, []);
 
   const onLogout = () => {
     dispatch(
