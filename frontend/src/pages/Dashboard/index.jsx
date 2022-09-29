@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getCookie, setCookie } from "../../utils/cookie";
 import userSlice from "../../slices/user";
@@ -20,7 +20,8 @@ export function Dashboard() {
 
   const [paths, setPaths] = useState([]);
   const [center, setCenter] = useState(null);
-  const [locationInfo, setLocationInfo] = useState({});
+  const [zoom, setZoom] = useState(11);
+  const [locationInfo, setLocationInfo] = useState(null);
   const [selectedCircleId, setSelectedCircleId] = useState(null);
 
   const [isOpen, setIsOpen] = useState(true);
@@ -28,21 +29,21 @@ export function Dashboard() {
 
   const { naver } = window;
 
+  const naverMap = useRef();
+
   useEffect(() => {
-    if (naver) {
-      let centerLat = 0;
-      let centerLng = 0;
-      csvjson.map((item) => {
-        const { lat, lng } = item;
-        centerLat += lat;
-        centerLng += lng;
-        setPaths((paths) => [...paths, new naver.maps.LatLng(lat, lng)]);
-      });
-      centerLat /= csvjson.length;
-      centerLng /= csvjson.length;
-      setCenter({ lat: centerLat, lng: centerLng });
-    }
-  }, [naver]);
+    let centerLat = 0;
+    let centerLng = 0;
+    csvjson.map((item) => {
+      const { lat, lng } = item;
+      centerLat += lat;
+      centerLng += lng;
+      setPaths((paths) => [...paths, { lat, lng }]);
+    });
+    centerLat /= csvjson.length;
+    centerLng /= csvjson.length;
+    setCenter({ lat: centerLat, lng: centerLng });
+  }, []);
 
   const onLogout = () => {
     dispatch(
@@ -57,17 +58,22 @@ export function Dashboard() {
   };
 
   const onPressCircle = (id) => {
-    const location = csvjson.filter((item) => item.id === id);
-    setSelectedCircleId(id);
-    setLocationInfo(location);
-    setIsOpen(true);
+    if (selectedCircleId && selectedCircleId === id) {
+      setSelectedCircleId(null);
+      setLocationInfo(null);
+    } else {
+      const location = csvjson.filter((item) => item.id === id);
+      setSelectedCircleId(id);
+      setLocationInfo(location[0]);
+      setIsOpen(true);
+    }
   };
 
   const toggleDrawer = () => {
     setIsOpen((prevState) => {
       if (prevState === true) {
         setSelectedCircleId(null);
-        setLocationInfo({});
+        setLocationInfo(null);
       }
       return !prevState;
     });
@@ -78,20 +84,63 @@ export function Dashboard() {
   };
 
   function Sidebar() {
-    if (locationInfo) {
-      const info = JSON.stringify(locationInfo[0], null, 4);
-      return <div style={{ display: "flex", width: "300px" }}>{info}</div>;
-    } else {
-      console.log(csvjson);
-      // return (
-      //   <div style={{ display: "flex", width: "300px" }}>
-      //     {csvjson.map((item) => {
-      //       console.log(item);
-      //       return <div>{item.datetime}</div>;
-      //     })}
-      //   </div>
-      // );
-    }
+    return (
+      <div
+        style={{
+          width: "350px",
+          height: "500px",
+          border: "1px solid black",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            padding: "10px",
+            overflow: "hidden",
+            overflowY: "auto",
+          }}
+        >
+          {locationInfo ? (
+            <div style={{ fontSize: "12px" }}>
+              <div>{`id: ${locationInfo.id} `}</div>
+              <div>{`date: ${locationInfo.datetime.split(" ")[0]} `}</div>
+              <div>{`time: ${locationInfo.datetime.split(" ")[1]} `}</div>
+              <div>{`lat: ${locationInfo.lat} `}</div>
+              <div>{`lng: ${locationInfo.lng} `}</div>
+            </div>
+          ) : (
+            csvjson.map((item, idx) => (
+              <>
+                <div
+                  key={idx}
+                  style={{ fontSize: "12px", marginBottom: "10px" }}
+                >
+                  <div>{`id: ${item.id} `}</div>
+                  <div>{`date: ${item.datetime.split(" ")[0]} `}</div>
+                  <div>{`time: ${item.datetime.split(" ")[1]} `}</div>
+                  <div>{`lat: ${item.lat} `}</div>
+                  <div>{`lng: ${item.lng} `}</div>
+                </div>
+                {idx !== csvjson.length - 1 && (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "1px",
+                      backgroundColor: "black",
+                      marginBottom: "10px",
+                    }}
+                  />
+                )}
+              </>
+            ))
+          )}
+        </div>
+      </div>
+    );
   }
 
   if (center) {
@@ -108,7 +157,8 @@ export function Dashboard() {
               height: "500px",
             }}
             defaultCenter={{ lat: center.lat, lng: center.lng }}
-            defaultZoom={11}
+            defaultZoom={zoom}
+            ref={naverMap}
           >
             {csvjson.map((item) => {
               const { id, lat, lng } = item;
@@ -116,18 +166,20 @@ export function Dashboard() {
                 <Circle
                   key={id}
                   center={{ x: lng, y: lat }}
-                  radius={id === selectedCircleId ? 130 : 100}
-                  fillOpacity={id === selectedCircleId ? 1 : 0.5}
-                  fillColor={id === selectedCircleId ? "blue" : "#FF0000"}
-                  strokeColor={"red"}
-                  clickable={true} // click event를 다루기 위해서는 true로 설정되어야함.
+                  // radius={id === selectedCircleId ? 800 / zoom : 1000 / zoom}
+                  radius={80}
+                  // fillOpacity={id === selectedCircleId ? 1 : 0.5}
+                  fillOpacity={0.3}
+                  fillColor={id === selectedCircleId ? "blue" : "red"}
+                  strokeColor={id === selectedCircleId ? "blue" : "red"}
+                  clickable={true}
                   onClick={() => onPressCircle(id)}
                 />
               );
             })}
             {isPolylineOpen && <Polyline path={paths} />}
           </NaverMap>
-          {isOpen && <Sidebar />}
+          <Sidebar />
         </div>
         <button onClick={onLogout}>로그아웃</button>
         <button onClick={toggleDrawer}>
