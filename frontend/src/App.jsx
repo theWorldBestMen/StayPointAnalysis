@@ -15,8 +15,9 @@ import { getCookie, setCookie } from "./utils/cookie";
 import styled from "styled-components";
 
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
 import Mypage from "./pages/Mypage";
+import DashBoard from "./pages/Dashboard";
+import MapView from "./pages/Dashboard/MapView";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -70,7 +71,15 @@ function App() {
             path="/dashboard"
             element={
               // <AuthRoute authenticated={authenticated}>
-              <Dashboard />
+              <DashBoard />
+              // </AuthRoute>
+            }
+          />
+          <Route
+            path="/mapview"
+            element={
+              // <AuthRoute authenticated={authenticated}>
+              <MapView />
               // </AuthRoute>
             }
           />
