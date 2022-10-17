@@ -5,6 +5,7 @@ export const refresh = async (refreshToken: string) => {
     if (!refreshToken) {
       return;
     }
+    console.log("Refreshing token: " + refreshToken);
     const response = await axios.get(
       `${process.env.REACT_APP_API_URL}/refresh`,
       {

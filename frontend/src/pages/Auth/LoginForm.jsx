@@ -35,6 +35,10 @@ export function LoginForm(props) {
       );
       console.log(response.data);
       alert("로그인 되었습니다.");
+      setCookie("refreshToken", response.data.refresh_token, {
+        secure: true,
+        // httpOnly: true,
+      });
       dispatch(
         userSlice.actions.setUser({
           name: response.data.data.name,
@@ -42,11 +46,7 @@ export function LoginForm(props) {
           accessToken: response.data.access_token,
         })
       );
-      setCookie("refreshToken", response.data.refresh_token, {
-        secure: true,
-        // httpOnly: true,
-      });
-      navigate("/dashboard");
+      // navigate("/mapview");
     } catch (error) {
       const errorResponse = error.response;
       if (errorResponse) {

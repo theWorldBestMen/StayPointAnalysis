@@ -25,6 +25,10 @@ export function MapView() {
   const naverMap = useRef();
 
   useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
+
+  useEffect(() => {
     let centerLat = 0;
     let centerLng = 0;
     csvjson.map((item) => {
@@ -132,7 +136,8 @@ export function MapView() {
   return (
     <div
       style={{
-        width: "100%",
+        // width: "100%",
+        margin: 50,
       }}
     >
       {center ? (
@@ -145,7 +150,7 @@ export function MapView() {
             <NaverMap
               style={{
                 width: "100%",
-                height: "600px",
+                marginRight: "10px",
               }}
               defaultCenter={{ lat: center.lat, lng: center.lng }}
               defaultZoom={11}

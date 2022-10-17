@@ -124,7 +124,16 @@ def login():
     return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
 
 
-@app.route('/users', methods=['GET'])
+@app.route('/devices', methods=['GET'])
+def devices_info():
+    user = TraccarAPI(base_url=TRACCAR_API_URL)
+    user.login_with_credentials(username='admin', password='admin')
+    device = user.get_all_devices()
+    
+    return jsonify(data=device), 200
+
+
+@app.route('/user', methods=['GET'])
 @jwt_required()
 def user_info():
     current_user = get_jwt_identity()
