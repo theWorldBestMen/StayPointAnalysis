@@ -3,10 +3,10 @@ import { useSelector } from "react-redux";
 import userSlice from "../../slices/user";
 import { RootState } from "../../store/reducer";
 
-function Researcher() {
+function ResearcherView() {
   // `${process.env.REACT_APP_TRACCAR_URL}`;
 
   return <div></div>;
 }
 
-export default Researcher;
+export default ResearcherView;

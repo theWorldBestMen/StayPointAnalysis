@@ -2,6 +2,7 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import MapView from "./MapView";
 import ChartView from "./ChartView";
+import ResearcherView from "./ResearcherView";
 
 function Dashboard() {
   return (
@@ -20,6 +21,9 @@ function Dashboard() {
         </Tab>
         <Tab eventKey="Chart" title="Chart">
           <ChartView />
+        </Tab>
+        <Tab eventKey="Researcher" title="연구자 메뉴">
+          <ResearcherView />
         </Tab>
       </Tabs>
     </div>
