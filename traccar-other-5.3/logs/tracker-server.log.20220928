@@ -1,0 +1,68 @@
+2022-09-28 00:49:34  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m47s875ms).
+2022-09-28 00:58:50  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9m16s307ms).
+2022-09-28 01:35:35  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=36m44s343ms).
+2022-09-28 02:02:28  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=26m52s996ms).
+2022-09-28 02:10:13  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m44s994ms).
+2022-09-28 02:20:42  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m29s740ms).
+2022-09-28 03:13:34  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=52m51s681ms).
+2022-09-28 04:35:39  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h22m5s5ms).
+2022-09-28 06:19:26  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h43m46s875ms).
+2022-09-28 07:38:41  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h19m15s44ms).
+2022-09-28 09:17:46  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h39m5s277ms).
+2022-09-28 10:41:01  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h23m14s526ms).
+2022-09-28 10:56:18  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m17s232ms).
+2022-09-28 11:14:43  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m54s989ms).
+2022-09-28 11:31:22  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m38s952ms).
+2022-09-28 11:41:38  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m15s971ms).
+2022-09-28 11:58:42  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m4s385ms).
+2022-09-28 12:15:52  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m10s27ms).
+2022-09-28 12:23:03  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m11s47ms).
+2022-09-28 12:39:13  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m9s711ms).
+2022-09-28 12:53:24  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=14m10s837ms).
+2022-09-28 13:12:39  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=18m45s328ms).
+2022-09-28 13:45:27  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m47s982ms).
+2022-09-28 14:16:21  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=30m53s643ms).
+2022-09-28 14:33:40  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m19s152ms).
+2022-09-28 15:24:13  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=50m33s458ms).
+2022-09-28 15:50:51  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=26m37s558ms).
+2022-09-28 17:20:21  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m29s472ms).
+2022-09-28 17:43:27  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=23m6s395ms).
+2022-09-28 17:48:30  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m2s295ms).
+2022-09-28 18:54:41  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h6m11s722ms).
+2022-09-28 19:06:58  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m17s170ms).
+2022-09-28 19:57:50  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m21s373ms).
+2022-09-28 20:56:37  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m16s580ms).
+2022-09-28 21:31:37  INFO: Stopping server...
+2022-09-28 21:42:56  INFO: Operating system name: Mac OS X version: 12.5 architecture: aarch64
+2022-09-28 21:42:56  INFO: Java runtime name: Java HotSpot(TM) 64-Bit Server VM vendor: Oracle Corporation version: 17.0.3.1+2-LTS-6
+2022-09-28 21:42:56  INFO: Memory limit heap: 2048mb non-heap: 0mb
+2022-09-28 21:42:56  INFO: Character encoding: UTF-8 charset: UTF-8
+2022-09-28 21:42:56  INFO: Version: 5.3
+2022-09-28 21:42:56  INFO: Starting server...
+2022-09-28 21:42:56  INFO: HikariPool-1 - Starting...
+2022-09-28 21:42:57  INFO: HikariPool-1 - Added connection conn0: url=jdbc:h2:./data/database user=SA
+2022-09-28 21:42:57  INFO: HikariPool-1 - Start completed.
+2022-09-28 21:42:57  INFO: Set default schema name to PUBLIC
+2022-09-28 21:42:57  INFO: Clearing database change log checksums
+2022-09-28 21:42:57  INFO: Successfully acquired change log lock
+2022-09-28 21:42:57  INFO: Successfully released change log lock
+2022-09-28 21:42:57  INFO: Successfully acquired change log lock
+2022-09-28 21:42:57  INFO: Cannot load service: liquibase.parser.ChangeLogParser: liquibase.parser.core.json.JsonChangeLogParser Unable to get public no-arg constructor
+2022-09-28 21:42:57  INFO: Cannot load service: liquibase.parser.ChangeLogParser: liquibase.parser.core.yaml.YamlChangeLogParser Unable to get public no-arg constructor
+2022-09-28 21:42:57  INFO: Reading from PUBLIC.DATABASECHANGELOG
+2022-09-28 21:42:57  INFO: Reading from PUBLIC.DATABASECHANGELOG
+2022-09-28 21:42:57  INFO: Cannot load service: liquibase.hub.HubService: Provider liquibase.hub.core.StandardHubService could not be instantiated
+2022-09-28 21:42:57  INFO: Successfully released change log lock
+2022-09-28 21:42:58  INFO: jetty-10.0.7; built: 2021-10-06T19:34:02.766Z; git: da8a4553af9dd84080931fa0f8c678cd2d60f3d9; jvm 17.0.3.1+2-LTS-6
+2022-09-28 21:42:58  INFO: Started o.t.w.@23ea8830{/,null,AVAILABLE}
+2022-09-28 21:42:58  INFO: Session workerName=node0
+2022-09-28 21:42:58  WARN: JAXBContext implementation could not be found. WADL feature is disabled.
+2022-09-28 21:42:58  INFO: Started o.e.j.s.ServletContextHandler@1d5048d1{/,null,AVAILABLE}
+2022-09-28 21:42:58  INFO: Started ServerConnector@6321a5aa{HTTP/1.1, (http/1.1)}{0.0.0.0:8082}
+2022-09-28 21:42:58  INFO: Started Server@f03ee8f{STARTING}[10.0.7,sto=0] @2364ms
+2022-09-28 21:53:55  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m28s7ms).
+2022-09-28 23:12:47  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=50s977ms).
+2022-09-28 23:25:52  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m33s960ms).
+2022-09-28 23:27:56  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=54s90ms).
+2022-09-28 23:30:36  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m9s838ms).
+2022-09-28 23:42:54  WARN: HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m48s250ms).
