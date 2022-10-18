@@ -1,1 +1,0 @@
-psql postgres -U hyu17grad;
