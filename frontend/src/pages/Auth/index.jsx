@@ -1,9 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { LoginForm } from "./LoginForm";
 import { motion } from "framer-motion";
 import { AccountContext } from "./accountContext";
 import { SignupForm } from "./SignupForm";
+import { getCookie, setCookie } from "../../utils/cookie";
+import refresh from "../../utils/refresh";
+import { getUserInfo } from "../../utils/getUserInfo";
+import userSlice from "../../slices/user";
+import { useAppDispatch } from "../../store";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+const AppContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
 const BoxContainer = styled.div`
   width: 350px;
@@ -105,6 +121,42 @@ const expandingTransition = {
 export default function Auth(props) {
   const [isExpanded, setExpanded] = useState(false);
   const [active, setActive] = useState("signin");
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const userInfo = useSelector((state: RootState) => state.user);
+  const authenticated = useSelector((state: RootState) => !!state.user.email);
+
+  useEffect(() => {
+    console.log(userInfo);
+    const autoLogin = async () => {
+      if (!authenticated) {
+        try {
+          const refreshToken = getCookie("refreshToken");
+          const response = await refresh(refreshToken);
+          if (!response) return;
+
+          const { access_token } = response.data;
+          const userResponse = await getUserInfo(access_token);
+          if (!userResponse) return;
+
+          const { email, name, role } = userResponse.data.data;
+          dispatch(
+            userSlice.actions.setUser({
+              name,
+              email,
+              role,
+              accessToken: access_token,
+            })
+          );
+          // navigate("/mypage");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    autoLogin();
+  }, [dispatch, navigate]);
 
   const playExpandingAnimation = () => {
     setExpanded(true);
@@ -130,25 +182,27 @@ export default function Auth(props) {
   const contextValue = { switchToSignup, switchToSignin };
 
   return (
-    <AccountContext.Provider value={contextValue}>
-      <BoxContainer>
-        <TopContainer>
-          <BackDrop
-            initial={false}
-            animate={isExpanded ? "expanded" : "collapsed"}
-            variants={backdropVariants}
-            transition={expandingTransition}
-          />
-          <HeaderContainer>
-            <HeaderText>한양대학교</HeaderText>
-            <HeaderText>위치 수집 시스템</HeaderText>
-          </HeaderContainer>
-        </TopContainer>
-        <InnerContainer>
-          {active === "signin" && <LoginForm />}
-          {active === "signup" && <SignupForm />}
-        </InnerContainer>
-      </BoxContainer>
-    </AccountContext.Provider>
+    <AppContainer>
+      <AccountContext.Provider value={contextValue}>
+        <BoxContainer>
+          <TopContainer>
+            <BackDrop
+              initial={false}
+              animate={isExpanded ? "expanded" : "collapsed"}
+              variants={backdropVariants}
+              transition={expandingTransition}
+            />
+            <HeaderContainer>
+              <HeaderText>한양대학교</HeaderText>
+              <HeaderText>위치 수집 시스템</HeaderText>
+            </HeaderContainer>
+          </TopContainer>
+          <InnerContainer>
+            {active === "signin" && <LoginForm />}
+            {active === "signup" && <SignupForm />}
+          </InnerContainer>
+        </BoxContainer>
+      </AccountContext.Provider>
+    </AppContainer>
   );
 }

@@ -1,20 +1,34 @@
-import React, { useEffect } from "react";
+import axios from "axios";
+import React, { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import userSlice from "../../slices/user";
 import { RootState } from "../../store/reducer";
 
 export function Mypage() {
   const userInfo = useSelector((state: RootState) => state.user);
-  console.log(userInfo);
-  return (
-    <div>
-      {Object.entries(userInfo).map((user) => {
-        if (user[0] !== "accessToken") {
-          return `${user[0]} : ${user[1]}, `;
+
+  useEffect(() => {
+    console.log(userInfo);
+    // onUser();
+  }, []);
+
+  const onUser = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/user`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.accessToken}`,
+          },
         }
-      })}
-    </div>
-  );
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  return <div>mypage</div>;
 }
 
 export default Mypage;

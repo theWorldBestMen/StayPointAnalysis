@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getUserInfo = async (accessToken: string) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

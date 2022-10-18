@@ -18,21 +18,17 @@ import Auth from "./pages/Auth";
 import Mypage from "./pages/Mypage";
 import DashBoard from "./pages/Dashboard";
 import MapView from "./pages/Dashboard/MapView";
-
-const AppContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
+import ChartView from "./pages/Dashboard/ChartView";
 
 function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userInfo = useSelector((state: RootState) => state.user);
-  const authenticated = useSelector((state: RootState) => !!state.user.email);
+  const authenticated = !!userInfo.email;
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
 
   // useEffect(() => {
   //   const autoLogin = async () => {
@@ -64,43 +60,25 @@ function App() {
 
   return (
     <RenderAfterNavermapsLoaded ncpClientId={process.env.REACT_APP_NCPClientId}>
-      <AppContainer>
-        <Routes>
-          <Route path="/" element={<Auth />} />
-          <Route
-            path="/dashboard"
-            element={
-              // <AuthRoute authenticated={authenticated}>
-              <DashBoard />
-              // </AuthRoute>
-            }
-          />
-          <Route
-            path="/mapview"
-            element={
-              // <AuthRoute authenticated={authenticated}>
-              <MapView />
-              // </AuthRoute>
-            }
-          />
-          <Route
-            path="/mypage"
-            element={
-              // <AuthRoute authenticated={authenticated}>
-              <Mypage />
-              // </AuthRoute>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <main style={{ padding: "1rem" }}>
-                <p>페이지 없음</p>
-              </main>
-            }
-          />
-        </Routes>
-      </AppContainer>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route
+          path="/dashboard"
+          element={
+            // <AuthRoute authenticated={authenticated}>
+            <DashBoard />
+            // </AuthRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <main style={{ padding: "1rem" }}>
+              <p>페이지 없음</p>
+            </main>
+          }
+        />
+      </Routes>
     </RenderAfterNavermapsLoaded>
   );
 }
