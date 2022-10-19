@@ -3,6 +3,7 @@ import Tabs from "react-bootstrap/Tabs";
 import MapView from "./MapView";
 import ChartView from "./ChartView";
 import ResearcherView from "./ResearcherView";
+import Mypage from "./Mypage";
 
 function Dashboard() {
   return (
@@ -24,6 +25,9 @@ function Dashboard() {
         </Tab>
         <Tab eventKey="Researcher" title="연구자 메뉴">
           <ResearcherView />
+        </Tab>
+        <Tab eventKey="Mypage" title="내 정보">
+          <Mypage />
         </Tab>
       </Tabs>
     </div>

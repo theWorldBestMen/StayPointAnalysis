@@ -6,16 +6,22 @@ from . import mongo, TRACCAR_API_URL
 
 user = Blueprint("user", __name__)
 
-@user.route('/')
+@user.route('')
 @jwt_required()
 def user_info():
     current_user = get_jwt_identity()
+    if mongo.db is None:
+        return jsonify(message="db error"), 500
+    
     user_info = mongo.db.user.find_one({'email': current_user})
+    
+    if not user_info:
+        return jsonify(message="no user data"), 400
     
     data = {
         "name": user_info["name"],
         "email": user_info["email"],
-            "role": user_info["role"],
+        "role": user_info["role"],
     }
     
     return jsonify(data=data), 200
@@ -26,5 +32,6 @@ def user_info():
 def refresh():
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
+    refresh_token = create_refresh_token(identity=current_user)
     
-    return jsonify(access_token=access_token, current_user=current_user)
+    return jsonify(access_token=access_token, refresh_token=refresh_token)

@@ -5,7 +5,6 @@ import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
 import { NaverMap, Circle, Marker, Polyline } from "react-naver-maps";
-import { getUserInfo } from "../../utils/getUserInfo";
 
 //test
 import csvjson from "../../assets/csvjson.json";
@@ -122,6 +121,7 @@ export function MapView() {
       userSlice.actions.setUser({
         name: "",
         email: "",
+        role: "",
         accessToken: "",
       })
     );
@@ -242,7 +242,7 @@ export function MapView() {
                       clickable={true}
                       onClick={() => onPressCircle(id)}
                     />
-                    <Marker position={{ x: lng, y: lat }} />
+                    {/* <Marker position={{ x: lng, y: lat }} /> */}
                   </>
                 );
               })}

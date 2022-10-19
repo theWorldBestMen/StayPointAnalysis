@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import styled from "styled-components";
 import { LoginForm } from "./LoginForm";
 import { motion } from "framer-motion";
 import { AccountContext } from "./accountContext";
 import { SignupForm } from "./SignupForm";
 import { getCookie, setCookie } from "../../utils/cookie";
-import refresh from "../../utils/refresh";
-import { getUserInfo } from "../../utils/getUserInfo";
 import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -122,24 +121,41 @@ export default function Auth(props) {
   const [isExpanded, setExpanded] = useState(false);
   const [active, setActive] = useState("signin");
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const userInfo = useSelector((state: RootState) => state.user);
-  const authenticated = useSelector((state: RootState) => !!state.user.email);
+  const authenticated = !!userInfo.email;
 
-  useEffect(() => {
-    console.log(userInfo);
-    const autoLogin = async () => {
-      if (!authenticated) {
-        try {
-          const refreshToken = getCookie("refreshToken");
-          const response = await refresh(refreshToken);
-          if (!response) return;
+  useLayoutEffect(() => {
+    const AutoLogin = async () => {
+      try {
+        const refreshToken = getCookie("refreshToken");
+        if (!refreshToken) {
+          return;
+        }
 
-          const { access_token } = response.data;
-          const userResponse = await getUserInfo(access_token);
-          if (!userResponse) return;
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/refresh`,
+          {
+            headers: {
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(response);
+          const { access_token, refresh_token } = response.data;
+          const userResponse = await axios.get(
+            `${process.env.REACT_APP_API_URL}/user`,
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
+            }
+          );
 
           const { email, name, role } = userResponse.data.data;
+
+          setCookie("refreshToken", refresh_token);
           dispatch(
             userSlice.actions.setUser({
               name,
@@ -148,15 +164,14 @@ export default function Auth(props) {
               accessToken: access_token,
             })
           );
-          // navigate("/mypage");
-        } catch (error) {
-          console.error(error);
         }
+      } catch (error) {
+        console.error(error);
       }
     };
 
-    autoLogin();
-  }, [dispatch, navigate]);
+    AutoLogin();
+  }, [dispatch]);
 
   const playExpandingAnimation = () => {
     setExpanded(true);
@@ -180,6 +195,10 @@ export default function Auth(props) {
   };
 
   const contextValue = { switchToSignup, switchToSignin };
+
+  if (authenticated) {
+    return <Navigate to="/dashboard" />;
+  }
 
   return (
     <AppContainer>

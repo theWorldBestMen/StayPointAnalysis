@@ -55,6 +55,12 @@ const users: DummyUser[] = [
     online: true,
     lastOnline: new Date("2022-09-17T13:10:00"),
   },
+  {
+    userId: 5,
+    userName: "hyunkyu",
+    online: false,
+    lastOnline: new Date("2022-10-19T00:40:00"),
+  },
   // {
   //   userId: 5,
   //   userName: "jiwoon",

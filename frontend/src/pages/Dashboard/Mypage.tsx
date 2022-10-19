@@ -9,23 +9,6 @@ export function Mypage() {
 
   useEffect(() => {
     console.log(userInfo);
-    // onUser();
-  }, []);
-
-  const onUser = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/user`,
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.accessToken}`,
-          },
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
   }, []);
 
   return <div>mypage</div>;

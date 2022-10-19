@@ -42,7 +42,7 @@ def signup():
     if not role:
         return jsonify(message="사용자 역할이 없습니다."), 400
     
-    if not mongo.db:
+    if mongo.db is None:
         return jsonify(message="database error"), 400
     
     if mongo.db.user.find_one({'email': email}):
@@ -96,8 +96,8 @@ def login():
     if not password:
         return jsonify(message="비밀번호가 없습니다."), 400
     
-    if not mongo.db:
-        return jsonify(message="database error"), 400
+    if mongo.db is None:
+        return jsonify(message="database error"), 500
 
     user_info = mongo.db.user.find_one({'email': email})
     if not user_info:
