@@ -22,7 +22,7 @@ const AppContainer = styled.div`
 
 const BoxContainer = styled.div`
   width: 350px;
-  min-height: 700px;
+  min-height: 750px;
   display: flex;
   flex-direction: column;
   border-radius: 19px;

@@ -7,6 +7,7 @@ from config import BaseConfig
 from api import mongo, bcrypt
 from api.auth import auth
 from api.user import user
+from api.researcher import researcher
 
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ bcrypt.init_app(app)
 
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(user, url_prefix='/user')
+app.register_blueprint(researcher, url_prefix='/researcher')
 
 
 if __name__ == "__main__":
