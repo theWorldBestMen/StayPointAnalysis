@@ -1,6 +1,6 @@
 postgres:
-  username: kyuber
-  password: 0609
+  username: hyu17grad
+  password: whfvm123!
   host: localhost
   port: 5432
   dbname: traccar_db
@@ -15,11 +15,10 @@ postgres:
     channel: channel
     timeout: 1000
 
-
 mongo:
   mongo:
-  username: kyuber
-  password: 0609
+  username: hyu17grad
+  password: whfvm123!
   host: localhost
   port: 27017
   dbname: hyu_staypoint
