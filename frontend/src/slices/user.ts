@@ -15,7 +15,7 @@ const userSlice = createSlice({
       state.name = action.payload.name;
       state.email = action.payload.email;
       state.role = action.payload.role;
-      state.accessToken = action.payload.accessToken; // 유효기간 (10분, 5분, 1시간 등)
+      state.accessToken = action.payload.accessToken;
     },
     setName(state, action) {
       state.name = action.payload;
