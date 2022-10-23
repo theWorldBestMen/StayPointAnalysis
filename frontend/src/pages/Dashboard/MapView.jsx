@@ -4,7 +4,9 @@ import { getCookie, setCookie } from "../../utils/cookie";
 import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
-import { NaverMap, Circle, Marker, Polyline } from "react-naver-maps";
+import { NaverMap, Circle, Marker } from "react-naver-maps";
+
+import Sidebar from "../../components/Sidebar";
 
 //test
 import csvjson from "../../assets/csvjson.json";
@@ -71,7 +73,13 @@ function clustering() {
     });
     clusteredItem = [
       ...clusteredItem,
-      { lat: centerLat, lng: centerLng, radius: maxDist, id: value[0] },
+      {
+        lat: centerLat,
+        lng: centerLng,
+        radius: maxDist,
+        id: value[0],
+        clusteredList: clusterArr[value[0]],
+      },
     ];
   });
 
@@ -88,7 +96,8 @@ export function MapView() {
   const [locationInfo, setLocationInfo] = useState(null);
   const [selectedCircleId, setSelectedCircleId] = useState(null);
 
-  const [isPolylineOpen, setPolylineOpen] = useState(true);
+  const [selectedPoint, setSelectedPoint] = useState(null);
+
   const naverMap = useRef();
   const [clusters, setClusters] = useState([]);
 
@@ -121,7 +130,6 @@ export function MapView() {
       userSlice.actions.setUser({
         name: "",
         email: "",
-        role: "",
         accessToken: "",
       })
     );
@@ -129,86 +137,23 @@ export function MapView() {
     navigate("/");
   };
 
-  const onPressCircle = (id) => {
-    if (selectedCircleId && selectedCircleId === id) {
-      setSelectedCircleId(null);
-      setLocationInfo(null);
-    } else {
-      const location = csvjson.filter((item) => item.id === id);
-      setSelectedCircleId(id);
-      setLocationInfo(location[0]);
-    }
+  const handleClickPoint = (item) => {
+    console.log(item);
+    setSelectedPoint(item);
   };
 
   const onSetDefault = () => {
-    setSelectedCircleId(null);
-    setLocationInfo(null);
+    setSelectedPoint(null);
   };
 
-  const togglePolyline = () => {
-    setPolylineOpen((prevState) => !prevState);
+  const onSetGeofence = async () => {
+    alert("set geofence");
   };
-
-  function Sidebar() {
-    return (
-      <div
-        style={{
-          width: "350px",
-          height: "600px",
-          border: "1px solid black",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            padding: "10px",
-            overflow: "hidden",
-            overflowY: "auto",
-          }}
-        >
-          {locationInfo ? (
-            <div style={{ fontSize: "12px" }}>
-              <div>{`id: ${locationInfo.id} `}</div>
-              <div>{`date: ${locationInfo.datetime.split(" ")[0]} `}</div>
-              <div>{`time: ${locationInfo.datetime.split(" ")[1]} `}</div>
-              <div>{`lat: ${locationInfo.lat} `}</div>
-              <div>{`lng: ${locationInfo.lng} `}</div>
-            </div>
-          ) : (
-            csvjson.map((item, idx) => (
-              <div key={idx} style={{ fontSize: "12px", marginBottom: "10px" }}>
-                <div>{`id: ${item.id} `}</div>
-                <div>{`date: ${item.datetime.split(" ")[0]} `}</div>
-                <div>{`time: ${item.datetime.split(" ")[1]} `}</div>
-                <div>{`lat: ${item.lat} `}</div>
-                <div>{`lng: ${item.lng} `}</div>
-                {idx !== csvjson.length - 1 && (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "1px",
-                      backgroundColor: "black",
-                      marginTop: "10px",
-                    }}
-                  />
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
       style={{
-        // width: "100%",
-        margin: 50,
+        margin: "10px 0",
       }}
     >
       {center ? (
@@ -227,7 +172,6 @@ export function MapView() {
               defaultZoom={11}
               ref={naverMap}
             >
-              }
               {clusters.map((item) => {
                 const { id, lat, lng, radius } = item;
                 return (
@@ -235,41 +179,34 @@ export function MapView() {
                     <Circle
                       key={id}
                       center={{ x: lng, y: lat }}
-                      radius={radius + 15}
+                      radius={radius + 10}
                       fillOpacity={id === selectedCircleId ? 0.8 : 0.3}
                       fillColor={id === selectedCircleId ? "navy" : "red"}
                       strokeColor={id === selectedCircleId ? "navy" : "red"}
                       clickable={true}
-                      onClick={() => onPressCircle(id)}
+                      onClick={() => handleClickPoint([item])}
                     />
-                    {/* <Marker position={{ x: lng, y: lat }} /> */}
                   </>
                 );
               })}
-              {/* {csvjson.map((item) => {
-                const { id, lat, lng } = item;
+              {Object.entries(CYR_cluster).map((item) => {
+                const { lat, lng } = item[1];
                 return (
-                  <Circle
-                    key={id}
-                    center={{ x: lng, y: lat }}
-                    radius={80}
-                    fillOpacity={id === selectedCircleId ? 0.8 : 0.3}
-                    fillColor={id === selectedCircleId ? "navy" : "red"}
-                    strokeColor={id === selectedCircleId ? "navy" : "red"}
+                  <Marker
+                    position={{ x: lng, y: lat }}
                     clickable={true}
-                    onClick={() => onPressCircle(id)}
+                    onClick={() => handleClickPoint([item[1]])}
                   />
                 );
-              })} */}
-              {isPolylineOpen && <Polyline path={paths} />}
+              })}
             </NaverMap>
-            <Sidebar />
+            <Sidebar
+              data={selectedPoint || csvjson}
+              onSetGeofence={onSetGeofence}
+            />
           </div>
           <button onClick={onLogout}>로그아웃</button>
           <button onClick={onSetDefault}>초기화</button>
-          <button onClick={togglePolyline}>
-            {isPolylineOpen ? "경로 숨기기" : "경로 보이기"}
-          </button>
         </div>
       ) : (
         <div>loading...</div>
