@@ -41,6 +41,11 @@ def add_stay_location(location_df: skmob.TrajDataFrame, deviceId: str, tag: str 
     data["raw"] = location_df.to_json()
     address_json = get_address(str(data["lng"]) + "," + str(data["lat"]))
     
+    print(address_json)
+    
+    if address_json == 0:
+        return;
+    
     for key in address_json:
         data[key] = address_json[key]
 

@@ -16,7 +16,6 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/signup", methods=["POST"])
 def signup():
-
     if not request.is_json:
         return jsonify(message="JSON 형식으로 요청해야 합니다."), 400
     

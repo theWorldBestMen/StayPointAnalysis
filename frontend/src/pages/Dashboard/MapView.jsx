@@ -10,7 +10,6 @@ import Sidebar from "../../components/Sidebar";
 
 //test
 import csvjson from "../../assets/csvjson.json";
-
 import CYR_cluster from "../../assets/30-CYR_cluster.json";
 
 function getDistanceFromLatLngInMeter(lat1, lng1, lat2, lng2) {

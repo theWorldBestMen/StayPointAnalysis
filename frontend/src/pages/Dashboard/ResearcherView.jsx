@@ -6,6 +6,9 @@ import { RootState } from "../../store/reducer";
 
 import green_light from "../../assets/image/green_light.png";
 import gray_light from "../../assets/image/gray_light.png";
+import axios from "axios";
+import { useAppDispatch } from "../../store";
+import { useNavigate } from "react-router-dom";
 
 const ButtonImage = styled.img`
   width: 25px;
@@ -164,7 +167,35 @@ function timeConversion(millisec: number) {
 }
 
 function ResearcherView() {
-  // `${process.env.REACT_APP_TRACCAR_URL}`;
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const userInfo = useSelector((state) => state.user);
+
+  const accessToken = userInfo.accessToken;
+
+  useEffect(() => {
+    loadSubjectsData();
+  }, []);
+
+  const loadSubjectsData = async () => {
+    try {
+      console.log(accessToken);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/researcher/subjects`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSetSubject = async () => {};
+
   function Sidebar() {
     return (
       <div
@@ -189,7 +220,10 @@ function ResearcherView() {
           {users.map((user: DummyUser) => {
             const { userId, userName, online, lastOnline } = user;
             return (
-              <StyledDiv id={userId.toString()}>
+              <StyledDiv
+                id={userId.toString()}
+                // onClick={() => onSetSubject(userEmail)}
+              >
                 <div>
                   {online ? (
                     <ButtonImage src={green_light} />

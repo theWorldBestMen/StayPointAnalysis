@@ -24,13 +24,13 @@ def replay_trajectory_in_pg(df, period=1):
               (protocol, id, deviceid, servertime, devicetime, fixtime, valid,
                latitude, longitude, altitude, speed, course, accuracy, attributes, address, network)
             values
-              ('replay', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+              ('replay', %s, '0011', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cur.execute(
                 query,
                 (   
                     row["id"],
-                    row["deviceid"],
+                    # row["deviceid"],
                     datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     row["devicetime"],
                     row["fixtime"],
@@ -67,7 +67,7 @@ def main():
     df = df[(df["longitude"] < korean_east) & (df["longitude"] > korean_west)]
 
     # Replay
-    replay_trajectory_in_pg(df, 0.4)
+    replay_trajectory_in_pg(df, 0)
 
 if __name__ == "__main__":
     main()
