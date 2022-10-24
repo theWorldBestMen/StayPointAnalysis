@@ -170,8 +170,9 @@ function ResearcherView() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userInfo = useSelector((state) => state.user);
-
   const accessToken = userInfo.accessToken;
+
+  const [subjectInfoList, setSubjectInfoList] = useState([]);
 
   useEffect(() => {
     loadSubjectsData();
@@ -179,7 +180,6 @@ function ResearcherView() {
 
   const loadSubjectsData = async () => {
     try {
-      console.log(accessToken);
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/researcher/subjects`,
         {
@@ -188,7 +188,9 @@ function ResearcherView() {
           },
         }
       );
-      console.log(response);
+      if (response.status === 200) {
+        setSubjectInfoList(response.data.data);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -217,7 +219,37 @@ function ResearcherView() {
             overflowY: "auto",
           }}
         >
-          {users.map((user: DummyUser) => {
+          {subjectInfoList.map((subjectInfo) => {
+            const { name, email, device_info } = subjectInfo;
+            console.log(device_info);
+            return (
+              <StyledDiv
+                id={email.toString()}
+                // onClick={() => onSetSubject(userEmail)}
+              >
+                <div>
+                  {device_info.status === "online" ? (
+                    <ButtonImage src={green_light} />
+                  ) : (
+                    <ButtonImage src={gray_light} />
+                  )}
+                  {name}
+                </div>
+
+                {device_info.status !== "online" &&
+                  !!device_info.lastUpdate && (
+                    <div style={{ color: "gray", fontSize: "15px" }}>
+                      {timeConversion(
+                        new Date().getTime() -
+                          new Date(device_info.lastUpdate).getTime()
+                      )}{" "}
+                      전
+                    </div>
+                  )}
+              </StyledDiv>
+            );
+          })}
+          {/* {users.map((user: DummyUser) => {
             const { userId, userName, online, lastOnline } = user;
             return (
               <StyledDiv
@@ -243,7 +275,7 @@ function ResearcherView() {
                 )}
               </StyledDiv>
             );
-          })}
+          })} */}
         </div>
       </div>
     );
