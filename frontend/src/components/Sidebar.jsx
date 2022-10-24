@@ -3,8 +3,7 @@ function Sidebar({ data, onSetGeofence }) {
     <div
       style={{
         width: "280px",
-        height: "600px",
-        border: "1px solid black",
+        height: "95vh",
         overflow: "hidden",
       }}
     >

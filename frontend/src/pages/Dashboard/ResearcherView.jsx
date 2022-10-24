@@ -16,9 +16,10 @@ const ButtonImage = styled.img`
   margin-right: 5px;
 `;
 
-const StyledDiv = styled.div`
+const SubjectButton = styled.button`
   display: flex;
   flex-direction: row;
+  background-color: white;
   justify-content: space-between;
   border: 1px solid black;
   margin-top: 5px;
@@ -64,86 +65,6 @@ const users: DummyUser[] = [
     online: false,
     lastOnline: new Date("2022-10-19T00:40:00"),
   },
-  // {
-  //   userId: 5,
-  //   userName: "jiwoon",
-  //   online: true,
-  // },
-  // {
-  //   userId: 6,
-  //   userName: "hyeji",
-  //   online: false,
-  // },
-  // {
-  //   userId: 7,
-  //   userName: "taewan",
-  //   online: false,
-  // },
-  // {
-  //   userId: 8,
-  //   userName: "younghan",
-  //   online: true,
-  // },
-  // {
-  //   userId: 9,
-  //   userName: "jiwoon",
-  //   online: true,
-  // },
-  // {
-  //   userId: 10,
-  //   userName: "hyeji",
-  //   online: false,
-  // },
-  // {
-  //   userId: 11,
-  //   userName: "taewan",
-  //   online: false,
-  // },
-  // {
-  //   userId: 12,
-  //   userName: "younghan",
-  //   online: true,
-  // },
-  // {
-  //   userId: 13,
-  //   userName: "jiwoon",
-  //   online: true,
-  // },
-  // {
-  //   userId: 14,
-  //   userName: "hyeji",
-  //   online: false,
-  // },
-  // {
-  //   userId: 15,
-  //   userName: "taewan",
-  //   online: false,
-  // },
-  // {
-  //   userId: 16,
-  //   userName: "younghan",
-  //   online: true,
-  // },
-  // {
-  //   userId: 17,
-  //   userName: "jiwoon",
-  //   online: true,
-  // },
-  // {
-  //   userId: 18,
-  //   userName: "hyeji",
-  //   online: false,
-  // },
-  // {
-  //   userId: 19,
-  //   userName: "taewan",
-  //   online: false,
-  // },
-  // {
-  //   userId: 20,
-  //   userName: "younghan",
-  //   online: true,
-  // },
 ];
 
 function timeConversion(millisec: number) {
@@ -196,13 +117,15 @@ function ResearcherView() {
     }
   };
 
-  const onSetSubject = async () => {};
+  const onSetSubject = (email) => {
+    console.log(email);
+  };
 
   function Sidebar() {
     return (
       <div
         style={{
-          width: "250px",
+          maxWidth: "250px",
           height: "600px",
           border: "1px solid black",
           overflow: "hidden",
@@ -223,9 +146,9 @@ function ResearcherView() {
             const { name, email, device_info } = subjectInfo;
             console.log(device_info);
             return (
-              <StyledDiv
+              <SubjectButton
                 id={email.toString()}
-                // onClick={() => onSetSubject(userEmail)}
+                onClick={() => onSetSubject(email)}
               >
                 <div>
                   {device_info.status === "online" ? (
@@ -246,7 +169,7 @@ function ResearcherView() {
                       전
                     </div>
                   )}
-              </StyledDiv>
+              </SubjectButton>
             );
           })}
           {/* {users.map((user: DummyUser) => {

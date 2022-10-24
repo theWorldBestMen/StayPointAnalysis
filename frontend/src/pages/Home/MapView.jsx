@@ -137,66 +137,63 @@ export function MapView() {
     alert("set geofence");
   };
 
+  if (!center) {
+    return <div>loading...</div>;
+  }
+
   return (
     <div
       style={{
         width: "100%",
       }}
     >
-      {center ? (
-        <div>
-          <div>
-            수집 기간: {csvjson[0].datetime.split(" ")[0]} ~{" "}
-            {csvjson[csvjson.length - 1].datetime.split(" ")[0]}
-          </div>
-          <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
-            <NaverMap
-              style={{
-                width: "100%",
-                marginRight: "10px",
-              }}
-              defaultCenter={{ lat: center.lat, lng: center.lng }}
-              defaultZoom={11}
-              ref={naverMap}
-            >
-              {clusters.map((item) => {
-                const { id, lat, lng, radius } = item;
-                return (
-                  <>
-                    <Circle
-                      key={id}
-                      center={{ x: lng, y: lat }}
-                      radius={radius + 10}
-                      fillOpacity={id === selectedCircleId ? 0.8 : 0.3}
-                      fillColor={id === selectedCircleId ? "navy" : "red"}
-                      strokeColor={id === selectedCircleId ? "navy" : "red"}
-                      clickable={true}
-                      onClick={() => handleClickPoint([item])}
-                    />
-                  </>
-                );
-              })}
-              {Object.entries(CYR_cluster).map((item) => {
-                const { lat, lng } = item[1];
-                return (
-                  <Marker
-                    position={{ x: lng, y: lat }}
-                    clickable={true}
-                    onClick={() => handleClickPoint([item[1]])}
-                  />
-                );
-              })}
-            </NaverMap>
-            <Sidebar
-              data={selectedPoint || csvjson}
-              onSetGeofence={onSetGeofence}
-            />
-          </div>
-          <button onClick={onSetDefault}>초기화</button>
-        </div>
-      ) : (
-        <div>loading...</div>
-      )}
+      {/* <div>
+        수집 기간: {csvjson[0].datetime.split(" ")[0]} ~{" "}
+        {csvjson[csvjson.length - 1].datetime.split(" ")[0]}
+        <button onClick={onSetDefault}>초기화</button>
+      </div> */}
+      <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
+        <NaverMap
+          style={{
+            width: "100%",
+          }}
+          defaultCenter={{ lat: center.lat, lng: center.lng }}
+          defaultZoom={11}
+          ref={naverMap}
+        >
+          {clusters.map((item) => {
+            const { id, lat, lng, radius } = item;
+            return (
+              <>
+                <Circle
+                  key={id}
+                  center={{ x: lng, y: lat }}
+                  radius={radius + 10}
+                  fillOpacity={id === selectedCircleId ? 0.8 : 0.3}
+                  fillColor={id === selectedCircleId ? "navy" : "red"}
+                  strokeColor={id === selectedCircleId ? "navy" : "red"}
+                  clickable={true}
+                  onClick={() => handleClickPoint([item])}
+                />
+              </>
+            );
+          })}
+          {Object.entries(CYR_cluster).map((item) => {
+            const { lat, lng } = item[1];
+            return (
+              <Marker
+                position={{ x: lng, y: lat }}
+                clickable={true}
+                onClick={() => handleClickPoint([item[1]])}
+              />
+            );
+          })}
+        </NaverMap>
+        <Sidebar
+          data={selectedPoint || csvjson}
+          onSetGeofence={onSetGeofence}
+        />
+      </div>
     </div>
   );
 }

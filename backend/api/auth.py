@@ -118,9 +118,5 @@ def login():
     
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
-    data = {
-        "name": user_info["name"],
-        "email": user_info["email"],
-        "role": user_info["role"],
-    }
-    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
+
+    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token), 200

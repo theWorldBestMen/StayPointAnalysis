@@ -5,7 +5,6 @@ import userSlice from "../slices/user";
 import subjectSlice from "../slices/subject";
 
 const persistConfig = {
-  // 새로운 persist config를 선언해준다.
   key: "root",
   storage: storageSession,
   whitelist: ["user"],

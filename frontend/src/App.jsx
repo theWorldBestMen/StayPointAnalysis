@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import React, { useEffect } from "react";
+import axios from "axios";
 
 import { useAppDispatch } from "./store";
 import { useSelector } from "react-redux";
 import { RootState } from "./store/reducer";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import AuthRoute from "./AuthRoute";
 import { RenderAfterNavermapsLoaded } from "react-naver-maps";
 
 import userSlice from "./slices/user";
 import { getCookie, setCookie } from "./utils/cookie";
-import styled from "styled-components";
 
-import Auth from "./pages/Auth";
+import MainLayout from "./layouts/Main";
+import Home from "./pages/Home";
 import DashBoard from "./pages/Dashboard";
+import Auth from "./pages/Auth";
 
 function App() {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const userInfo = useSelector((state: RootState) => state.user);
   const authenticated = !!userInfo.email;
 
@@ -60,13 +60,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route
-          path="/dashboard"
           element={
             <AuthRoute authenticated={authenticated}>
-              <DashBoard />
+              <MainLayout />
             </AuthRoute>
           }
-        />
+        >
+          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<DashBoard />} />
+        </Route>
         <Route
           path="*"
           element={
