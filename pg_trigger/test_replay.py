@@ -24,7 +24,7 @@ def replay_trajectory_in_pg(df, period=1):
               (protocol, id, deviceid, servertime, devicetime, fixtime, valid,
                latitude, longitude, altitude, speed, course, accuracy, attributes, address, network)
             values
-              ('replay', %s, '0011', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+              ('replay', %s, 6, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cur.execute(
                 query,
@@ -55,7 +55,7 @@ def create_replay_df_from_csv(csv_path: str) -> pd.DataFrame:
   
 def main():
     # Load replay data
-    csv_path = "./location_data/30-CYR.csv"
+    csv_path = "./location_data/31-KMS.csv"
     df = create_replay_df_from_csv(csv_path)
 
     # Remove Positions outside Korea penninsula

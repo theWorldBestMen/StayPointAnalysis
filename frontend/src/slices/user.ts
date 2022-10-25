@@ -6,7 +6,7 @@ const initialState = {
   role: "",
   researcher: "",
   subjects: [],
-  deviceId: "",
+  device_info: {},
   accessToken: "",
 };
 
@@ -20,8 +20,11 @@ const userSlice = createSlice({
       state.role = action.payload.role;
       state.researcher = action.payload.researcher;
       state.subjects = action.payload.subjects;
-      state.deviceId = action.payload.device_id;
+      state.device_info = action.payload.device_info;
       state.accessToken = action.payload.accessToken;
+    },
+    setDeviceInfo(state, action) {
+      state.device_info = action.payload;
     },
     setAccessToken(state, action) {
       state.accessToken = action.payload;

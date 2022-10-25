@@ -70,7 +70,7 @@ def signup():
     user_data = traccar_data
     user_data["phone"] = phone
     user_data["role"] = role
-    user_data["device_id"] = device["uniqueId"]
+    user_data["device_id"] = device["id"]
     
     if role == "researcher":
         user_data["subjects"] = []

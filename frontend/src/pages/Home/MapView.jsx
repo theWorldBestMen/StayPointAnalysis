@@ -6,11 +6,33 @@ import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
 import { NaverMap, Circle, Marker } from "react-naver-maps";
 
+import Cluster from "./Cluster";
+
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+
 import Sidebar from "../../components/Sidebar";
 
 //test
 import csvjson from "../../assets/csvjson.json";
 import CYR_cluster from "../../assets/30-CYR_cluster.json";
+import styled from "styled-components";
+import StayPoints from "./StayPoints";
+import axios from "axios";
+
+const OptionHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  background-color: #e1e2e1;
+  color: black;
+  fontsize: 16px;
+`;
 
 function getDistanceFromLatLngInMeter(lat1, lng1, lat2, lng2) {
   function deg2rad(deg) {
@@ -89,44 +111,70 @@ export function MapView() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userInfo = useSelector((state) => state.user);
+  const accessToken = userInfo.accessToken;
 
-  const [paths, setPaths] = useState([]);
-  const [center, setCenter] = useState(null);
+  const subjectInfo = useSelector((state) => state.subject);
+
+  const [center, setCenter] = useState({ lat: 37.541, lng: 126.986 });
+  const [stayPointList, setStayPointList] = useState([]);
   const [locationInfo, setLocationInfo] = useState(null);
-  const [selectedCircleId, setSelectedCircleId] = useState(null);
 
   const [selectedPoint, setSelectedPoint] = useState(null);
 
   const naverMap = useRef();
   const [clusters, setClusters] = useState([]);
 
-  useEffect(() => {
-    const clusteredItem = clustering();
-    console.log(clusteredItem);
-    setClusters(clusteredItem);
-  }, []);
+  useLayoutEffect(() => {
+    loadStayPoints(subjectInfo.email);
+  }, [subjectInfo]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const clusteredItem = clustering();
+  //   console.log(clusteredItem);
+  //   setClusters(clusteredItem);
+  // }, []);
+
+  const getCenter = (data) => {
     let centerLat = 0;
     let centerLng = 0;
-    csvjson.map((item) => {
+    data.map((item) => {
       const { lat, lng } = item;
       centerLat += lat;
       centerLng += lng;
-      setPaths((paths) => [...paths, { lat, lng }]);
     });
-    centerLat /= csvjson.length;
-    centerLng /= csvjson.length;
-    setCenter({ lat: centerLat, lng: centerLng });
-  }, []);
+    centerLat /= data.length;
+    centerLng /= data.length;
 
-  useEffect(() => {
-    console.log("locationInfo", locationInfo);
-  }, [locationInfo]);
+    const newCenter = { lat: centerLat, lng: centerLng };
+
+    return newCenter;
+  };
+
+  const loadStayPoints = async (email) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/stay_point/${email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setStayPointList(response.data.data);
+        if (response.data.data.length > 0) {
+          const newCenter = getCenter(response.data.data);
+          setCenter(newCenter);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleClickPoint = (item) => {
-    console.log(item);
-    setSelectedPoint(item);
+    setSelectedPoint([item]);
   };
 
   const onSetDefault = () => {
@@ -137,22 +185,43 @@ export function MapView() {
     alert("set geofence");
   };
 
-  if (!center) {
-    return <div>loading...</div>;
-  }
-
   return (
-    <div
-      style={{
-        width: "100%",
-      }}
-    >
-      {/* <div>
-        수집 기간: {csvjson[0].datetime.split(" ")[0]} ~{" "}
-        {csvjson[csvjson.length - 1].datetime.split(" ")[0]}
-        <button onClick={onSetDefault}>초기화</button>
-      </div> */}
-      <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
+    <div>
+      <OptionHeader>
+        {stayPointList.length > 0 ? (
+          <div style={{ fontSize: "15px" }}>
+            수집 기간:{" "}
+            {
+              new Date(stayPointList[stayPointList.length - 1].datetime)
+                .toISOString()
+                .split("T")[0]
+            }{" "}
+            ~ {new Date(stayPointList[0].datetime).toISOString().split("T")[0]}
+          </div>
+        ) : (
+          <div />
+        )}
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ fontSize: "15px", marginRight: "2px" }}>반경 설정</div>
+          <InputGroup size="sm" style={{ width: "150px", marginRight: "2px" }}>
+            <Form.Control placeholder="반경 입력" type="number" />
+            <Button variant="outline-dark">확인</Button>
+          </InputGroup>
+          <Button size="sm" variant="outline-dark" onClick={onSetDefault}>
+            초기화
+          </Button>
+        </div>
+      </OptionHeader>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "90vh",
+        }}
+      >
         <NaverMap
           style={{
             width: "100%",
@@ -161,37 +230,20 @@ export function MapView() {
           defaultZoom={11}
           ref={naverMap}
         >
-          {clusters.map((item) => {
-            const { id, lat, lng, radius } = item;
-            return (
-              <>
-                <Circle
-                  key={id}
-                  center={{ x: lng, y: lat }}
-                  radius={radius + 10}
-                  fillOpacity={id === selectedCircleId ? 0.8 : 0.3}
-                  fillColor={id === selectedCircleId ? "navy" : "red"}
-                  strokeColor={id === selectedCircleId ? "navy" : "red"}
-                  clickable={true}
-                  onClick={() => handleClickPoint([item])}
-                />
-              </>
-            );
-          })}
-          {Object.entries(CYR_cluster).map((item) => {
-            const { lat, lng } = item[1];
-            return (
-              <Marker
-                position={{ x: lng, y: lat }}
-                clickable={true}
-                onClick={() => handleClickPoint([item[1]])}
-              />
-            );
-          })}
+          <StayPoints
+            data={stayPointList}
+            handleClickPoint={handleClickPoint}
+          />
+          {/* <Cluster
+            clusters={clusters}
+            handleClickPoint={handleClickPoint}
+            selectedCircleId={selectedCircleId}
+          /> */}
         </NaverMap>
         <Sidebar
-          data={selectedPoint || csvjson}
+          data={selectedPoint ? selectedPoint : stayPointList}
           onSetGeofence={onSetGeofence}
+          handleClickPoint={handleClickPoint}
         />
       </div>
     </div>

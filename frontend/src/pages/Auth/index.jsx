@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import styled from "styled-components";
 import { LoginForm } from "./LoginForm";
 import { motion } from "framer-motion";
@@ -172,6 +172,10 @@ export default function Auth(props) {
 
     AutoLogin();
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
 
   const playExpandingAnimation = () => {
     setExpanded(true);

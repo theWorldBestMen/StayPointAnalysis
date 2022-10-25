@@ -15,6 +15,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import green_light from "../../assets/image/green_light.png";
 import gray_light from "../../assets/image/gray_light.png";
 import axios from "axios";
+import subjectSlice from "../../slices/subject";
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -58,20 +59,46 @@ function Header() {
   const navigate = useNavigate();
   const userInfo = useSelector((state: RootState) => state.user);
   const accessToken = userInfo.accessToken;
+  const subjectInfo = useSelector((state: RootState) => state.subject);
+
+  const myInfo = {
+    name: userInfo.name,
+    email: userInfo.email,
+    device_info: userInfo.device_info,
+  };
 
   const [subjectInfoList, setSubjectInfoList] = useState([]);
-  const [subjectInfo, setSubjectInfo] = useState(null);
-
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   useEffect(() => {
+    loadMyData();
     if (userInfo.role === "researcher") {
       loadSubjectsData();
     }
+    dispatch(subjectSlice.actions.setSubject(myInfo));
   }, []);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
+
+  const loadMyData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/user/device`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const { device_info } = response.data.data;
+        dispatch(userSlice.actions.setDeviceInfo(device_info));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const loadSubjectsData = async () => {
     try {
@@ -92,11 +119,21 @@ function Header() {
   };
 
   const onSetSubject = (subject) => {
-    setSubjectInfo(subject);
+    dispatch(subjectSlice.actions.setSubject(subject));
   };
 
   const onLogout = () => {
-    dispatch(userSlice.actions.setUser({}));
+    dispatch(
+      userSlice.actions.setUser({
+        name: "",
+        email: "",
+        role: "",
+        researcher: "",
+        subjects: [],
+        device_info: {},
+        accessToken: "",
+      })
+    );
     setCookie("refreshToken", "");
     navigate("/");
   };
@@ -116,7 +153,7 @@ function Header() {
         {userInfo.role === "researcher" && (
           <div>관리 실험자 수: {userInfo.subjects.length}</div>
         )}
-        <div>장치 식별자: {userInfo.deviceId}</div>
+        <div>장치 식별자: {userInfo.device_info.uniqueId}</div>
       </Popover.Body>
     </Popover>
   );
@@ -136,62 +173,87 @@ function Header() {
             variant="light"
             id="dropdown-basic"
           >
-            {subjectInfo ? (
-              <div
-                style={{
-                  position: "absolute",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  left: 0,
-                  right: 0,
-                }}
-              >
-                {subjectInfo.status === "online" ? (
+            <div
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+              }}
+            >
+              {subjectInfo.device_info.status === "online" ? (
+                <ButtonImage src={green_light} />
+              ) : (
+                <ButtonImage src={gray_light} />
+              )}
+              {subjectInfo.name}
+            </div>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu style={{ minWidth: "220px" }}>
+            {subjectInfoList.length > 0 &&
+              subjectInfoList.map((subjectInfo) => {
+                const { name, email, device_info } = subjectInfo;
+                return (
+                  <Dropdown.Item
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                    id={email.toString()}
+                    onClick={() => onSetSubject(subjectInfo)}
+                  >
+                    <div>
+                      {device_info.status === "online" ? (
+                        <ButtonImage src={green_light} />
+                      ) : (
+                        <ButtonImage src={gray_light} />
+                      )}
+                      {name}
+                    </div>
+
+                    {device_info.status !== "online" &&
+                      !!device_info.lastUpdate && (
+                        <div style={{ color: "gray", fontSize: "15px" }}>
+                          {timeConversion(
+                            new Date().getTime() -
+                              new Date(device_info.lastUpdate).getTime()
+                          )}{" "}
+                          전
+                        </div>
+                      )}
+                  </Dropdown.Item>
+                );
+              })}
+
+            {subjectInfoList.length > 0 && <Dropdown.Divider />}
+
+            <Dropdown.Item
+              style={{ display: "flex", justifyContent: "space-between" }}
+              id={myInfo.email.toString()}
+              onClick={() => onSetSubject(myInfo)}
+            >
+              <div>
+                {myInfo.device_info.status === "online" ? (
                   <ButtonImage src={green_light} />
                 ) : (
                   <ButtonImage src={gray_light} />
                 )}
-                {subjectInfo.name}
+                {myInfo.name}
               </div>
-            ) : (
-              123
-            )}
-          </Dropdown.Toggle>
 
-          <Dropdown.Menu style={{ minWidth: "220px" }}>
-            {subjectInfoList.map((subjectInfo) => {
-              const { name, email, device_info } = subjectInfo;
-              console.log(device_info);
-              return (
-                <Dropdown.Item
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                  id={email.toString()}
-                  onClick={() => onSetSubject(subjectInfo)}
-                >
-                  <div>
-                    {device_info.status === "online" ? (
-                      <ButtonImage src={green_light} />
-                    ) : (
-                      <ButtonImage src={gray_light} />
-                    )}
-                    {name}
+              {myInfo.device_info.status !== "online" &&
+                !!myInfo.device_info.lastUpdate && (
+                  <div style={{ color: "gray", fontSize: "15px" }}>
+                    {timeConversion(
+                      new Date().getTime() -
+                        new Date(myInfo.device_info.lastUpdate).getTime()
+                    )}{" "}
+                    전
                   </div>
-
-                  {device_info.status !== "online" &&
-                    !!device_info.lastUpdate && (
-                      <div style={{ color: "gray", fontSize: "15px" }}>
-                        {timeConversion(
-                          new Date().getTime() -
-                            new Date(device_info.lastUpdate).getTime()
-                        )}{" "}
-                        전
-                      </div>
-                    )}
-                </Dropdown.Item>
-              );
-            })}
+                )}
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+
         <Button
           style={{ backgroundColor: "transparent", borderColor: "transparent" }}
           onClick={() => navigate("/home")}

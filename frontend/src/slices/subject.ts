@@ -3,26 +3,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   name: "",
   email: "",
-  role: "",
+  device_info: {},
 };
 
 const subjectSlice = createSlice({
   name: "subject",
   initialState,
   reducers: {
-    setUser(state, action) {
+    setSubject(state, action) {
       state.name = action.payload.name;
       state.email = action.payload.email;
-      state.role = action.payload.role;
-    },
-    setName(state, action) {
-      state.name = action.payload;
-    },
-    setEmail(state, action) {
-      state.email = action.payload;
-    },
-    setRole(state, action) {
-      state.role = action.payload;
+      state.device_info = action.payload.device_info;
     },
   },
   extraReducers: (builder) => {},

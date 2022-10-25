@@ -1,4 +1,3 @@
-import email
 from flask import request, jsonify, Blueprint
 from flask_jwt_extended import ( jwt_required, create_access_token, get_jwt_identity, create_refresh_token )
 
@@ -64,7 +63,7 @@ def get_subjects_by_researchers():
     device_info_list = traccar.get_all_devices()
     
     for device_info in device_info_list:
-        device_id = device_info["uniqueId"]
+        device_id = device_info["id"]
         if device_id in device_id_to_subject:
             device_id_to_subject[device_id]["device_info"] = device_info
     
