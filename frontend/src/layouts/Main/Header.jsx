@@ -7,7 +7,8 @@ import { useAppDispatch } from "../../store/index";
 import userSlice from "../../slices/user";
 import { setCookie } from "../../utils/cookie";
 
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
+import Button from "@mui/material/Button";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -29,8 +30,8 @@ const HeaderContainer = styled.div`
 `;
 
 const ButtonImage = styled.img`
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   margin-right: 5px;
 `;
 
@@ -182,11 +183,6 @@ function Header() {
                 right: 0,
               }}
             >
-              {subjectInfo.device_info.status === "online" ? (
-                <ButtonImage src={green_light} />
-              ) : (
-                <ButtonImage src={gray_light} />
-              )}
               {subjectInfo.name}
             </div>
           </Dropdown.Toggle>
@@ -255,13 +251,21 @@ function Header() {
         </Dropdown>
 
         <Button
-          style={{ backgroundColor: "transparent", borderColor: "transparent" }}
+          style={{
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            color: "white",
+          }}
           onClick={() => navigate("/home")}
         >
           홈
         </Button>
         <Button
-          style={{ backgroundColor: "transparent", borderColor: "transparent" }}
+          style={{
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            color: "white",
+          }}
           onClick={() => navigate("/dashboard")}
         >
           대시보드
@@ -270,11 +274,28 @@ function Header() {
 
       <div>
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
-          <Button style={{ marginRight: "5px" }} variant="light" size="sm">
+          <Button
+            style={{
+              marginRight: "5px",
+              backgroundColor: "white",
+              color: "black",
+            }}
+            variant="contained"
+            size="small"
+          >
             내 정보
           </Button>
         </OverlayTrigger>
-        <Button variant="light" size="sm" onClick={onLogout}>
+        <Button
+          style={{
+            marginRight: "5px",
+            backgroundColor: "white",
+            color: "black",
+          }}
+          variant="contained"
+          size="small"
+          onClick={onLogout}
+        >
           로그아웃
         </Button>
       </div>

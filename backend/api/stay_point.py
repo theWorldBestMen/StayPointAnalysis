@@ -34,6 +34,7 @@ def get_stay_points(user_email):
         "sido": stay_point["sido"],
         "gungu": stay_point["gungu"],
         "dong": stay_point["dong"],
+        "doro": stay_point["doro"],
         "num1": stay_point["num1"],
         "num2": stay_point["num2"],
         "type": {

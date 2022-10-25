@@ -1,3 +1,12 @@
+import {
+  List,
+  ListItemButton,
+  ListItemSecondaryAction,
+  ListItemText,
+  Stack,
+  Typography,
+} from "@mui/material";
+
 function Sidebar({ data, onSetGeofence, handleClickPoint }) {
   return (
     <div
@@ -9,6 +18,80 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
       }}
     >
       <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          padding: "10px",
+          overflow: "hidden",
+          overflowY: "auto",
+        }}
+      >
+        <List
+          component="nav"
+          sx={{
+            px: 0,
+            py: 0,
+          }}
+        >
+          {data.map((item, idx) => {
+            console.log(item);
+
+            const datetime = new Date(item.datetime)
+              .toISOString()
+              .split(".")[0]
+              .replace("T", " ");
+            let coord = `${item.lng}, ${item.lat}`;
+            if (coord.length > 23) {
+              coord = coord.substring(0, 20) + "...";
+            }
+            coord = "(" + coord + ")";
+
+            let address = `${item.sido} ${item.gungu} ${item.doro} ${item.num1}`;
+            if (item.num2) address += `-${item.num2}`;
+            if (idx !== data.length - 1) {
+              return (
+                <ListItemButton
+                  divider
+                  key={idx}
+                  onClick={() => handleClickPoint(item)}
+                >
+                  <Stack alignItems="flex-start">
+                    <Typography variant="subtitle1">id {item.id}</Typography>
+                    <Typography variant="subtitle2" noWrap>
+                      {coord}
+                    </Typography>
+                    <Typography variant="body2">{address}</Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      {datetime}
+                    </Typography>
+                  </Stack>
+                </ListItemButton>
+              );
+            } else {
+              return (
+                <ListItemButton
+                  key={idx}
+                  onClick={() => handleClickPoint(item)}
+                >
+                  <Stack alignItems="flex-start">
+                    <Typography variant="subtitle1">id {item.id}</Typography>
+                    <Typography variant="subtitle2" noWrap>
+                      {coord}
+                    </Typography>
+                    <Typography variant="body2">{address}</Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      {datetime}
+                    </Typography>
+                  </Stack>
+                </ListItemButton>
+              );
+            }
+          })}
+        </List>
+      </div>
+      {/* <div
         style={{
           width: "100%",
           height: "100%",
@@ -89,7 +172,7 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
             </>
           );
         })}
-      </div>
+      </div> */}
     </div>
   );
 }

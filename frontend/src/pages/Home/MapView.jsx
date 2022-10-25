@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { getCookie, setCookie } from "../../utils/cookie";
-import userSlice from "../../slices/user";
 import { useAppDispatch } from "../../store/index";
 import { useNavigate } from "react-router-dom";
-import { NaverMap, Circle, Marker } from "react-naver-maps";
-
-import Cluster from "./Cluster";
+import { NaverMap } from "react-naver-maps";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -15,11 +11,11 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Sidebar from "../../components/Sidebar";
 
 //test
-import csvjson from "../../assets/csvjson.json";
 import CYR_cluster from "../../assets/30-CYR_cluster.json";
 import styled from "styled-components";
-import StayPoints from "./StayPoints";
 import axios from "axios";
+import StayPoints from "./StayPoints";
+import Cluster from "./Cluster";
 
 const OptionHeader = styled.div`
   display: flex;
@@ -64,7 +60,6 @@ function clustering() {
       clusterArr[clusterNum] = [item];
     }
   });
-  // console.log(clusterArr);
 
   let clusteredItem = [];
   Object.entries(clusterArr).map((value) => {
@@ -117,7 +112,6 @@ export function MapView() {
 
   const [center, setCenter] = useState({ lat: 37.541, lng: 126.986 });
   const [stayPointList, setStayPointList] = useState([]);
-  const [locationInfo, setLocationInfo] = useState(null);
 
   const [selectedPoint, setSelectedPoint] = useState(null);
 
@@ -128,11 +122,11 @@ export function MapView() {
     loadStayPoints(subjectInfo.email);
   }, [subjectInfo]);
 
-  // useEffect(() => {
-  //   const clusteredItem = clustering();
-  //   console.log(clusteredItem);
-  //   setClusters(clusteredItem);
-  // }, []);
+  useEffect(() => {
+    const clusteredItem = clustering();
+    console.log(clusteredItem);
+    setClusters(clusteredItem);
+  }, []);
 
   const getCenter = (data) => {
     let centerLat = 0;
@@ -202,7 +196,10 @@ export function MapView() {
           <div />
         )}
 
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <Button size="sm" variant="outline-dark" onClick={onSetDefault}>
+          초기화
+        </Button>
+        {/* <div style={{ display: "flex", alignItems: "center" }}>
           <div style={{ fontSize: "15px", marginRight: "2px" }}>반경 설정</div>
           <InputGroup size="sm" style={{ width: "150px", marginRight: "2px" }}>
             <Form.Control placeholder="반경 입력" type="number" />
@@ -211,7 +208,7 @@ export function MapView() {
           <Button size="sm" variant="outline-dark" onClick={onSetDefault}>
             초기화
           </Button>
-        </div>
+        </div> */}
       </OptionHeader>
 
       <div
@@ -230,6 +227,7 @@ export function MapView() {
           defaultZoom={11}
           ref={naverMap}
         >
+          {/* <StayPoints data={CYR_cluster} handleClickPoint={handleClickPoint} /> */}
           <StayPoints
             data={stayPointList}
             handleClickPoint={handleClickPoint}
@@ -237,7 +235,7 @@ export function MapView() {
           {/* <Cluster
             clusters={clusters}
             handleClickPoint={handleClickPoint}
-            selectedCircleId={selectedCircleId}
+            // selectedCircleId={selectedCircleId}
           /> */}
         </NaverMap>
         <Sidebar
