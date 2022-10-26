@@ -17,7 +17,7 @@ def get_device(deviceid: int):
     """
     Read the device from the Mongo database.
     """
-    db = client.traccar
+    db = client.hyu_staypoint
     return db.devices.find_one({"id": deviceid})
 
 
@@ -40,10 +40,15 @@ def add_stay_location(location_df: skmob.TrajDataFrame, deviceId: str, tag: str 
     data["raw"] = location_df.to_json()
     address_json = get_address(str(data["lng"]) + "," + str(data["lat"]))
     
+    print(address_json)
+    
+    if address_json == 0:
+        return;
+    
     for key in address_json:
         data[key] = address_json[key]
 
-    db = client.traccar
+    db = client.hyu_staypoint
     print("staypoint added")
     db.devices.insert_one(data)
     
@@ -53,7 +58,7 @@ def get_stay_locations(deviceid: int, start: datetime = None, end: datetime = No
     Read the stay locations of a device.
     """
 
-    db = client.traccar
+    db = client.hyu_staypoint
     start = start if start else datetime(1970, 1, 1)
     if end is None:
         return db.devices.find({"deviceid": deviceid, "datetime": {"$gte": start}})
@@ -65,5 +70,5 @@ def get_devices() -> List[int]:
     """
     Get the deviceids from the Mongo database.
     """
-    db = client.traccar
+    db = client.hyu_staypoint
     return db.devices.distinct("deviceid")

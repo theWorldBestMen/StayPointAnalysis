@@ -24,7 +24,6 @@ export function LoginForm(props) {
   const [password, setPassword] = useState("");
 
   const onSubmit = useCallback(async () => {
-    console.log(email, password);
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/login`,
@@ -33,20 +32,31 @@ export function LoginForm(props) {
           password,
         }
       );
-      console.log(response.data);
-      alert("로그인 되었습니다.");
-      setCookie("refreshToken", response.data.refresh_token, {
-        secure: true,
-        // httpOnly: true,
-      });
-      dispatch(
-        userSlice.actions.setUser({
-          name: response.data.data.name,
-          email: response.data.data.email,
-          accessToken: response.data.access_token,
-        })
-      );
-      // navigate("/mapview");
+      if (response.status === 200) {
+        const { access_token, refresh_token } = response.data;
+
+        const userInfo = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+        console.log("userInfo", userInfo.data.data);
+        const { data } = userInfo.data;
+        alert("로그인 되었습니다.");
+        setCookie("refreshToken", refresh_token, {
+          secure: true,
+          // httpOnly: true,
+        });
+        dispatch(
+          userSlice.actions.setUser({
+            ...data,
+            accessToken: access_token,
+          })
+        );
+      }
     } catch (error) {
       const errorResponse = error.response;
       if (errorResponse) {

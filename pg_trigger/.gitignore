@@ -3,3 +3,4 @@ location_data
 common/__pycache__
 pg_watcher/__pycache__
 position/__pycache_
+config.yaml

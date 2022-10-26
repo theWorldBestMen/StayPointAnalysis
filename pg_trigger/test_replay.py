@@ -55,7 +55,7 @@ def create_replay_df_from_csv(csv_path: str) -> pd.DataFrame:
   
 def main():
     # Load replay data
-    csv_path = "./location_data/31-KMS.csv"
+    csv_path = "./location_data/32-BWR.csv"
     df = create_replay_df_from_csv(csv_path)
 
     # Remove Positions outside Korea penninsula
@@ -67,7 +67,7 @@ def main():
     df = df[(df["longitude"] < korean_east) & (df["longitude"] > korean_west)]
 
     # Replay
-    replay_trajectory_in_pg(df, 0.4)
+    replay_trajectory_in_pg(df, 0.1)
 
 if __name__ == "__main__":
     main()

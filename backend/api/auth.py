@@ -1,3 +1,4 @@
+from select import select
 from flask import request, jsonify, Blueprint
 
 from flask_jwt_extended import ( create_access_token, create_refresh_token )
@@ -6,19 +7,15 @@ from requests.auth import HTTPBasicAuth
 from pytraccar.api import TraccarAPI
 
 from . import mongo, bcrypt, TRACCAR_API_URL
+from constant import role
 
 import datetime
 
 auth = Blueprint("auth", __name__)
 
 
-@auth.route("/")
-def hello():
-    return jsonify(message="Hello"), 200
-
 @auth.route("/signup", methods=["POST"])
 def signup():
-
     if not request.is_json:
         return jsonify(message="JSON 형식으로 요청해야 합니다."), 400
     
@@ -32,6 +29,7 @@ def signup():
     email = incoming["email"]
     password = incoming["password"]
     role = incoming["role"]
+    selected_researcher = incoming["selectedResearcher"]
     
     if not name:
         return jsonify(message="이름이 없습니다."), 400
@@ -42,7 +40,7 @@ def signup():
     if not role:
         return jsonify(message="사용자 역할이 없습니다."), 400
     
-    if not mongo.db:
+    if mongo.db is None:
         return jsonify(message="database error"), 400
     
     if mongo.db.user.find_one({'email': email}):
@@ -72,12 +70,22 @@ def signup():
     user_data = traccar_data
     user_data["phone"] = phone
     user_data["role"] = role
-    user_data["device_id"] = device["uniqueId"]
+    user_data["device_id"] = device["id"]
+    
+    if role == "researcher":
+        user_data["subjects"] = []
+    elif role == "subject":
+        user_data["researcher"] = selected_researcher
+        
+        query = {'email': selected_researcher}
+        researcher = mongo.db.user.find_one(query)
+        researcher["subjects"].append(email)
+        update_researcher = mongo.db.user.update_one(query, {"$set":researcher})
+        print(update_researcher)
     
     id = mongo.db.user.insert_one(user_data)
     
     user = mongo.db.user.find_one({'email': email})
-    print(f'user info in mongo: {user}')
     
     return jsonify(message="회원가입이 완료되었습니다."), 200
 
@@ -96,8 +104,8 @@ def login():
     if not password:
         return jsonify(message="비밀번호가 없습니다."), 400
     
-    if not mongo.db:
-        return jsonify(message="database error"), 400
+    if mongo.db is None:
+        return jsonify(message="database error"), 500
 
     user_info = mongo.db.user.find_one({'email': email})
     if not user_info:
@@ -110,9 +118,5 @@ def login():
     
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
-    data = {
-        "name": user_info["name"],
-        "email": user_info["email"],
-        "role": user_info["role"],
-    }
-    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
+
+    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token), 200
