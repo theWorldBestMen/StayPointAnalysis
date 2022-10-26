@@ -10,12 +10,13 @@ import InputGroup from "react-bootstrap/InputGroup";
 
 import Sidebar from "../../components/Sidebar";
 
-//test
-import CYR_cluster from "../../assets/30-CYR_cluster.json";
 import styled from "styled-components";
 import axios from "axios";
-import StayPoints from "./StayPoints";
+import Markers from "./StayPoints";
 import Cluster from "./Cluster";
+
+//test
+import CYR_cluster from "../../assets/30-CYR_cluster.json";
 
 const OptionHeader = styled.div`
   display: flex;
@@ -110,23 +111,24 @@ export function MapView() {
 
   const subjectInfo = useSelector((state) => state.subject);
 
-  const [center, setCenter] = useState({ lat: 37.541, lng: 126.986 });
   const [stayPointList, setStayPointList] = useState([]);
 
+  const [center, setCenter] = useState({ lat: 37.541, lng: 126.986 });
   const [selectedPoint, setSelectedPoint] = useState(null);
 
   const naverMap = useRef();
   const [clusters, setClusters] = useState([]);
 
-  useLayoutEffect(() => {
-    loadStayPoints(subjectInfo.email);
-  }, [subjectInfo]);
-
   useEffect(() => {
-    const clusteredItem = clustering();
-    console.log(clusteredItem);
-    setClusters(clusteredItem);
-  }, []);
+    loadStayPoints(subjectInfo.email);
+    return () => setStayPointList([]);
+  }, [subjectInfo, userInfo]);
+
+  // useEffect(() => {
+  //   const clusteredItem = clustering();
+  //   console.log(clusteredItem);
+  //   setClusters(clusteredItem);
+  // }, []);
 
   const getCenter = (data) => {
     let centerLat = 0;
@@ -157,6 +159,7 @@ export function MapView() {
 
       if (response.status === 200) {
         setStayPointList(response.data.data);
+
         if (response.data.data.length > 0) {
           const newCenter = getCenter(response.data.data);
           setCenter(newCenter);
@@ -228,9 +231,10 @@ export function MapView() {
           ref={naverMap}
         >
           {/* <StayPoints data={CYR_cluster} handleClickPoint={handleClickPoint} /> */}
-          <StayPoints
+          <Markers
             data={stayPointList}
             handleClickPoint={handleClickPoint}
+            selectedPoint={selectedPoint}
           />
           {/* <Cluster
             clusters={clusters}

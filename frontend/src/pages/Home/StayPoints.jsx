@@ -1,6 +1,6 @@
 import { Marker } from "react-naver-maps";
 
-function StayPoints({ data, handleClickPoint }) {
+function Markers({ data, handleClickPoint, selectedPoint }) {
   return (
     <>
       {data.map((item) => {
@@ -17,7 +17,7 @@ function StayPoints({ data, handleClickPoint }) {
   );
 }
 
-export default StayPoints;
+export default Markers;
 
 // for dummy data
 

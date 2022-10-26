@@ -7,6 +7,26 @@ import {
   Typography,
 } from "@mui/material";
 
+function timeConversion(millisec: number) {
+  var seconds = Math.floor(millisec / 1000);
+
+  var minutes = Math.floor(millisec / (1000 * 60));
+
+  var hours = Math.floor(millisec / (1000 * 60 * 60));
+
+  var days = Math.floor(millisec / (1000 * 60 * 60 * 24));
+
+  if (Number(hours) >= 24) {
+    return days + "일";
+  } else if (Number(minutes) >= 60) {
+    return hours + "시간";
+  } else if (Number(seconds) >= 60) {
+    return minutes + "분";
+  } else {
+    return seconds + "초";
+  }
+}
+
 function Sidebar({ data, onSetGeofence, handleClickPoint }) {
   return (
     <div
@@ -42,6 +62,16 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
               .toISOString()
               .split(".")[0]
               .replace("T", " ");
+            const leavingDatetime = new Date(item.leaving_datetime)
+              .toISOString()
+              .split(".")[0]
+              .replace("T", " ");
+
+            const remainTime = timeConversion(
+              new Date(item.leaving_datetime).getTime() -
+                new Date(item.datetime).getTime()
+            );
+
             let coord = `${item.lng}, ${item.lat}`;
             if (coord.length > 23) {
               coord = coord.substring(0, 20) + "...";
@@ -50,6 +80,7 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
 
             let address = `${item.sido} ${item.gungu} ${item.doro} ${item.num1}`;
             if (item.num2) address += `-${item.num2}`;
+            if (item.type.value) address += ` (${item.type.value})`;
             if (idx !== data.length - 1) {
               return (
                 <ListItemButton
@@ -58,13 +89,19 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
                   onClick={() => handleClickPoint(item)}
                 >
                   <Stack alignItems="flex-start">
-                    <Typography variant="subtitle1">id {item.id}</Typography>
+                    {/* <Typography variant="subtitle1">id {item.id}</Typography> */}
                     <Typography variant="subtitle2" noWrap>
                       {coord}
                     </Typography>
                     <Typography variant="body2">{address}</Typography>
                     <Typography variant="subtitle2" color="#6B6B6B">
                       {datetime}
+                    </Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      ~ {leavingDatetime}
+                    </Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      {remainTime} 동안 머무름
                     </Typography>
                   </Stack>
                 </ListItemButton>
@@ -76,13 +113,19 @@ function Sidebar({ data, onSetGeofence, handleClickPoint }) {
                   onClick={() => handleClickPoint(item)}
                 >
                   <Stack alignItems="flex-start">
-                    <Typography variant="subtitle1">id {item.id}</Typography>
+                    {/* <Typography variant="subtitle1">id {item.id}</Typography> */}
                     <Typography variant="subtitle2" noWrap>
                       {coord}
                     </Typography>
                     <Typography variant="body2">{address}</Typography>
                     <Typography variant="subtitle2" color="#6B6B6B">
                       {datetime}
+                    </Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      ~ {leavingDatetime}
+                    </Typography>
+                    <Typography variant="subtitle2" color="#6B6B6B">
+                      {remainTime} 동안 머무름
                     </Typography>
                   </Stack>
                 </ListItemButton>
