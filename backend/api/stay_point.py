@@ -6,6 +6,8 @@ from pytraccar.api import TraccarAPI
 
 from . import mongo, TRACCAR_API_URL
 
+from collections import defaultdict
+
 stay_point = Blueprint("stay_point", __name__)
 
 @stay_point.route('/<user_email>')
@@ -45,4 +47,24 @@ def get_stay_points(user_email):
       data.append(stay_point_data)
     data.sort(key=lambda x: x["datetime"])
     data = data[::-1]
+    return jsonify(data=data), 200
+  
+@stay_point.route('/<user_email>/sigungu')
+@jwt_required()
+def get_stay_points_sigungu_count(user_email):
+    if mongo.db is None:
+      return jsonify(message="db error"), 500
+
+    user_info = mongo.db.user.find_one({'email': user_email})
+
+    if not user_info:
+      return jsonify(message="no user data"), 400
+    
+      
+    stay_points = mongo.db.devices.find({"deviceid": user_info["device_id"]})
+
+    data = defaultdict(int)
+    for stay_point in stay_points:
+      data[stay_point["gungu"]] += 1
+
     return jsonify(data=data), 200

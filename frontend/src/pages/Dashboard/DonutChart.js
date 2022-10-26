@@ -5,6 +5,8 @@ import { useTheme } from "@mui/material/styles";
 
 // third-party
 import ReactApexChart from "react-apexcharts";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 // chart options
 const areaChartOptions = {
@@ -14,58 +16,53 @@ const areaChartOptions = {
   legend: {
     position: "bottom",
   },
-  // responsive: [
-  //   {
-  //     // breakpoint: 480,
-  //     options: {
-  //       // chart: {
-  //       //   width: 300,
-  //       // },
-  //       legend: {
-  //         position: "bottom",
-  //       },
-  //     },
-  //   },
-  // ],
 };
 
 // ==============================|| DONUT CHART ||============================== //
 
 const DonutChart = () => {
-  const theme = useTheme();
-
-  const { primary, secondary } = theme.palette.text;
-  const line = theme.palette.divider;
+  const userInfo = useSelector((state) => state.user);
+  const accessToken = userInfo.accessToken;
+  const subjectInfo = useSelector((state) => state.subject);
 
   const [options, setOptions] = useState(areaChartOptions);
+  const [series, setSeries] = useState([]);
 
-  // useEffect(() => {
-  //     setOptions((prevState) => ({
-  //         ...prevState,
-  //         colors: [theme.palette.warning.main],
-  //         xaxis: {
-  //             labels: {
-  //                 style: {
-  //                     colors: [secondary, secondary, secondary, secondary, secondary, secondary, secondary, secondary]
-  //                 }
-  //             }
-  //         },
-  //         grid: {
-  //             borderColor: line
-  //         },
-  //         tooltip: {
-  //             theme: 'light'
-  //         },
-  //         legend: {
-  //             labels: {
-  //                 colors: 'grey.500'
-  //             }
-  //         }
-  //     }));
-  // }, [primary, secondary, line, theme]);
-  // series: [44, 55, 13, 43, 22],
+  useEffect(() => {
+    loadStayPointsCountBySigungu(subjectInfo.email);
+    return () => {
+      setOptions(null);
+      setSeries([]);
+    };
+  }, [subjectInfo, userInfo]);
 
-  const [series] = useState([44, 55, 41, 17, 15]);
+  const loadStayPointsCountBySigungu = async (email) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/stay_point/${email}/sigungu`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const { data } = response.data;
+        const sortable = Object.entries(data)
+          .sort(([, a], [, b]) => b - a)
+          .reduce((r, [k, v]) => ({ ...r, [k]: v }), []);
+        console.log(sortable);
+        setOptions((prev) => ({
+          ...prev,
+          labels: Object.keys(sortable),
+        }));
+        setSeries(Object.values(sortable));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div id="chart">
