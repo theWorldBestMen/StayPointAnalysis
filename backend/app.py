@@ -8,6 +8,7 @@ from api import mongo, bcrypt
 from api.auth import auth
 from api.user import user
 from api.researcher import researcher
+from api.stay_point import stay_point
 
 
 app = Flask(__name__)
@@ -20,6 +21,7 @@ bcrypt.init_app(app)
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(user, url_prefix='/user')
 app.register_blueprint(researcher, url_prefix='/researcher')
+app.register_blueprint(stay_point, url_prefix='/stay_point')
 
 
 if __name__ == "__main__":

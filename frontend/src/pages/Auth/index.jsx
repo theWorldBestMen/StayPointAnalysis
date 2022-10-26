@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import styled from "styled-components";
 import { LoginForm } from "./LoginForm";
 import { motion } from "framer-motion";
@@ -142,9 +142,9 @@ export default function Auth(props) {
         );
 
         if (response.status === 200) {
-          console.log(response);
           const { access_token, refresh_token } = response.data;
-          const userResponse = await axios.get(
+
+          const userInfo = await axios.get(
             `${process.env.REACT_APP_API_URL}/user`,
             {
               headers: {
@@ -152,15 +152,15 @@ export default function Auth(props) {
               },
             }
           );
-
-          const { email, name, role } = userResponse.data.data;
-
-          setCookie("refreshToken", refresh_token);
+          console.log("userInfo", userInfo.data.data);
+          const { data } = userInfo.data;
+          setCookie("refreshToken", refresh_token, {
+            secure: true,
+            // httpOnly: true,
+          });
           dispatch(
             userSlice.actions.setUser({
-              name,
-              email,
-              role,
+              ...data,
               accessToken: access_token,
             })
           );
@@ -172,6 +172,10 @@ export default function Auth(props) {
 
     AutoLogin();
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
 
   const playExpandingAnimation = () => {
     setExpanded(true);
@@ -197,7 +201,7 @@ export default function Auth(props) {
   const contextValue = { switchToSignup, switchToSignin };
 
   if (authenticated) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/home" />;
   }
 
   return (

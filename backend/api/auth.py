@@ -16,7 +16,6 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/signup", methods=["POST"])
 def signup():
-
     if not request.is_json:
         return jsonify(message="JSON 형식으로 요청해야 합니다."), 400
     
@@ -71,7 +70,7 @@ def signup():
     user_data = traccar_data
     user_data["phone"] = phone
     user_data["role"] = role
-    user_data["device_id"] = device["uniqueId"]
+    user_data["device_id"] = device["id"]
     
     if role == "researcher":
         user_data["subjects"] = []
@@ -119,9 +118,5 @@ def login():
     
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
-    data = {
-        "name": user_info["name"],
-        "email": user_info["email"],
-        "role": user_info["role"],
-    }
-    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token, data=data), 200
+
+    return jsonify(message="로그인 되었습니다.", access_token=access_token, refresh_token=refresh_token), 200
