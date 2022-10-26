@@ -397,7 +397,7 @@ class TraccarAPI:
         path = self._urls['notifications']
         data = {'all': True}
         req = self._session.get(url=path, params=data)
-
+        
         if req.status_code == 200:
             return req.json()
         elif req.status_code == 400:

@@ -1,9 +1,9 @@
+from backend.pytraccar.api import TraccarAPI
 from flask import request, jsonify, Blueprint
 
 from flask_jwt_extended import ( jwt_required, create_access_token, get_jwt_identity, create_refresh_token )
 
 from . import mongo, TRACCAR_API_URL
-
 user = Blueprint("user", __name__)
 
 @user.route('/')
@@ -20,6 +20,11 @@ def user_info():
     
     return jsonify(data=data), 200
   
+@user.route('/geofence')
+@jwt_required()
+def user_geofence():
+    traccar = TraccarAPI(base_url=TRACCAR_API_URL)
+    traccar.create_geofence()
 
 @user.route('/refresh')
 @jwt_required(refresh=True)

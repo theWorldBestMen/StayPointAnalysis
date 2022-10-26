@@ -1,6 +1,5 @@
 from ast import main
 from curses import def_shell_mode
-from this import d
 from typing import Any, List
 from pymongo.mongo_client import MongoClient
 from common.config import read_config
@@ -10,7 +9,7 @@ from positions.reverse_geocoding import get_address
 
 configs = read_config()
 mongo_url = "mongodb://{host}:{port}".format(**configs["mongo"])
-print("print mongo client" +  mongo_url)
+print("mongo client" +  mongo_url)
 client = MongoClient(mongo_url)
 
 

@@ -10,15 +10,15 @@ from positions.store import (
 )
 from positions.traccar_models import TcPosition
 from skmob import TrajDataFrame
-from skmob.preprocessing import filtering, detection
+from skmob.preprocessing import filtering, detection, clustering
+from skmob.measures.individual import distance_straight_line
 from geopy import Point
 from geopy.distance import geodesic
-
 
 stop_threshold_minute = 20
 stop_threshold_km = 0.2
 stop_waiting_threshold_seconds = 600
-
+count = 0
 
 def filter_and_detect_stops(df: TrajDataFrame) -> TrajDataFrame:
   """
@@ -26,10 +26,32 @@ def filter_and_detect_stops(df: TrajDataFrame) -> TrajDataFrame:
   """
   try:
       tdf = TrajDataFrame(df, latitude="latitude", longitude="longitude", datetime="fixtime", user_id="deviceid")
+      print(tdf.shape)
       ftdf = filtering.filter(tdf, max_speed_kmh=300.0, include_loops=True)
       stdf = detection.stay_locations(
           ftdf, leaving_time=True, minutes_for_a_stop=stop_threshold_minute, spatial_radius_km=stop_threshold_km
       )
+     
+      len_tdf = len(tdf)
+      if len_tdf > 19 and len_tdf % 20 == 0:
+        distance_straight_line_result = distance_straight_line(tdf, False)
+        print(distance_straight_line_result)
+        print("start checking staypoint for recent 20 points")
+        tem_tdf = tdf[len_tdf - 20:len_tdf]
+        print(tem_tdf.head)
+        # tem_stdf = detection.stay_locations(tem_tdf, leaving_time=True, minutes_for_a_stop=0.000000001, spatial_radius_km=0.000000000005)
+        # print(tem_stdf)
+        tem_ctdf = clustering.cluster(tem_tdf, cluster_radius_km=0.005, min_samples=1)
+        print(tem_ctdf)
+        
+        # cluster index의 값을 기준으로 나눠야함
+        # pd.counter
+        
+        if len(tem_ctdf) == 1:
+          # notice to server
+          print("staying one point now")
+        elif len(tem_ctdf) > 1:
+          print("moving now")
       return stdf
   except Exception as err:
       print("\n에러 발생", err)

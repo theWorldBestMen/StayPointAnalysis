@@ -11,7 +11,7 @@ def get_address_from_json(result):
 
   json_object = json.loads(new_str)
   if json_object.get('status').get('code') != 0:
-    return 0;
+    return 0
   else:
     json_result_list = json_object["results"] 
     count = 0
