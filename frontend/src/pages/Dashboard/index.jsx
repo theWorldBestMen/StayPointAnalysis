@@ -6,7 +6,7 @@ import axios from "axios";
 import { Grid, Typography } from "@mui/material";
 
 import MainCard from "../../components/MainCard";
-import MonthlyBarChart from "./MonthlyBarChart";
+import SigunguChart from "./SigunguChart";
 import ReportAreaChart from "./ReportAreaChart";
 import DonutChart from "./DonutChart";
 
@@ -47,7 +47,19 @@ function Dashboard() {
         <Grid item xs={6} md={4} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h6">시군구 별 개수</Typography>
+              <Typography variant="h6">시군구 별 데이터 개수</Typography>
+            </Grid>
+            <Grid item />
+          </Grid>
+          <MainCard sx={{ mt: 1 }} content={false}>
+            <SigunguChart />
+          </MainCard>
+        </Grid>
+
+        <Grid item xs={6} md={4} lg={4}>
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
+              <Typography variant="h6">군집 별 데이터 개수</Typography>
             </Grid>
             <Grid item />
           </Grid>
@@ -59,19 +71,7 @@ function Dashboard() {
         <Grid item xs={6} md={4} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h6">시군구 별 개수</Typography>
-            </Grid>
-            <Grid item />
-          </Grid>
-          <MainCard sx={{ mt: 1 }} content={false}>
-            <MonthlyBarChart />
-          </MainCard>
-        </Grid>
-
-        <Grid item xs={6} md={4} lg={4}>
-          <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item>
-              <Typography variant="h6">날짜별 추출 개수</Typography>
+              <Typography variant="h6">날짜별 추출된 데이터 개수</Typography>
             </Grid>
             <Grid item />
           </Grid>

@@ -29,17 +29,17 @@ const DonutChart = () => {
   const [series, setSeries] = useState([]);
 
   useEffect(() => {
-    loadStayPointsCountBySigungu(subjectInfo.email);
+    loadStayPointsCountByCluster(subjectInfo.email);
     return () => {
       setOptions(null);
       setSeries([]);
     };
   }, [subjectInfo, userInfo]);
 
-  const loadStayPointsCountBySigungu = async (email) => {
+  const loadStayPointsCountByCluster = async (email) => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/stay_point/${email}/sigungu`,
+        `${process.env.REACT_APP_API_URL}/stay_point/${email}/cluster`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -48,16 +48,29 @@ const DonutChart = () => {
       );
 
       if (response.status === 200) {
+        console.log(response.data.data);
         const { data } = response.data;
-        const sortable = Object.entries(data)
-          .sort(([, a], [, b]) => b - a)
-          .reduce((r, [k, v]) => ({ ...r, [k]: v }), []);
-        console.log(sortable);
+        let data_series = [];
+        let data_labels = [];
+        data.map((item) => {
+          const { center_lat, center_lng, point_count } = item[1];
+          data_labels = [
+            ...data_labels,
+            `${center_lng.toString().substring(0, 8)}, ${center_lat
+              .toString()
+              .substring(0, 8)}`,
+          ];
+          data_series = [...data_series, point_count];
+        });
+        // const sortable = Object.entries(data)
+        //   .sort(([, a], [, b]) => b - a)
+        //   .reduce((r, [k, v]) => ({ ...r, [k]: v }), []);
+        // console.log(sortable);
         setOptions((prev) => ({
           ...prev,
-          labels: Object.keys(sortable),
+          labels: data_labels,
         }));
-        setSeries(Object.values(sortable));
+        setSeries(data_series);
       }
     } catch (error) {
       console.error(error);

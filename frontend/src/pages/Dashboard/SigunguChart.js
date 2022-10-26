@@ -37,7 +37,7 @@ const barChartOptions = {
 
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
-const MonthlyBarChart = () => {
+const SigunguChart = () => {
   const userInfo = useSelector((state) => state.user);
   const accessToken = userInfo.accessToken;
   const subjectInfo = useSelector((state) => state.subject);
@@ -117,4 +117,4 @@ const MonthlyBarChart = () => {
   );
 };
 
-export default MonthlyBarChart;
+export default SigunguChart;
