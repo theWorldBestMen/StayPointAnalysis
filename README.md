@@ -1,4 +1,4 @@
-# Client_and_Server
+# StayPointAnalysis
 
 ## Installation 
 - in backend dir <br>
@@ -52,7 +52,7 @@
 ├── backend
 │   ├── config.py
 │   ├── index.py
-│   ├── main.py -> main src의 app을 
+│   ├── main.py
 │   ├── manage.py
 │   ├── setup.py
 │   └── src
